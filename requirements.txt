@@ -1,2 +1,2 @@
-comtypes==1.1.3
+comtypes
 
