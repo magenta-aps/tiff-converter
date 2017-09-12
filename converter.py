@@ -1,19 +1,24 @@
 import os
+import sys
 import comtypes.client
 
 WD_FORMAT_PDF = 17
-SOURCE_DIR = 'C:/Users/IEUser/Documents/jscript/docs'
+# SOURCE_DIR = 'C:/Users/IEUser/Documents/jscript/docs'
 TARGET_DIR = 'C:/Users/IEUser/Documents/jscript/pdfs'
 
-# Create target dir...
+source_dir = sys.argv[1]
+
+target_dir = os.path.abspath(TARGET_DIR)
+if not os.path.isdir(target_dir):
+    os.mkdir(target_dir)
 
 docs = [
-    os.path.join(os.path.abspath(SOURCE_DIR), f)
-    for f in os.listdir(SOURCE_DIR)
+    os.path.join(os.path.abspath(source_dir), f)
+    for f in os.listdir(source_dir)
 ]
 pdfs = [
     os.path.join(os.path.abspath(TARGET_DIR), os.path.splitext(f)[0] + '.pdf')
-    for f in os.listdir(SOURCE_DIR)
+    for f in os.listdir(source_dir)
 ]
 
 word_app = comtypes.client.CreateObject('Word.Application')
