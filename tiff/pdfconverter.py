@@ -4,7 +4,11 @@ import comtypes.client
 
 
 class PdfConverter(object):
+
     def convert(self, file):
+        pass
+    
+    def close(self):
         pass
 
 
@@ -19,15 +23,16 @@ class DocToPdfConverter(PdfConverter):
         # TODO: maybe use contextmanager instead
 
         pdf_path = os.path.join(os.path.abspath(self.temp_dir),
-                                os.path.splitext(file)[0] + '.pdf')
+                                os.path.splitext(os.path.basename(file))[0] + '.pdf')
 
         try:
             doc = self.word.Documents.Open(file)
             doc.SaveAs(pdf_path, FileFormat=DocToPdfConverter.WD_FORMAT_PDF)
             return pdf_path
-        except:
+        except Exception as e:
             pass
         finally:
             doc.Close()
 
-
+    def close(self):
+        self.word.Quit()

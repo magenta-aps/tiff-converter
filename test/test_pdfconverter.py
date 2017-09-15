@@ -1,3 +1,5 @@
+import os
+import tempfile
 import unittest
 
 from tiff.pdfconverter import DocToPdfConverter
@@ -5,10 +7,17 @@ from tiff.pdfconverter import DocToPdfConverter
 
 class TestDocToPdfConverter(unittest.TestCase):
 
-    def test_should_return_tmp_doc1_pdf(self):
-        conv = DocToPdfConverter()
-        self.assertEqual('/tmp/doc1.pdf', conv.convert('doc1.docx'))
+    def setUp(self):
+        self.temp_dir = tempfile.gettempdir()
+        self.converter = DocToPdfConverter(self.temp_dir)
 
-    # def test_should_return_tmp_doc2_pdf(self):
-    #     conv = DocToPdfConverter()
-    #     self.assertEqual('/tmp/doc2.pdf', conv.convert('doc2.docx'))
+    def test_should_return_tmp_doc1_pdf(self):
+        doc_path = os.path.abspath('test/resources/demo.docx')
+        self.assertEqual(os.path.join(self.temp_dir, 'demo.pdf'), self.converter.convert(doc_path))
+
+    def test_should_return_tmp_doc2_pdf(self):
+        doc_path = os.path.abspath('test/resources/demo2.docx')
+        self.assertEqual(os.path.join(self.temp_dir, 'demo2.pdf'), self.converter.convert(doc_path))
+
+    def tearDown(self):
+        self.converter.close()
