@@ -1,11 +1,11 @@
 import os
 import platform
+
 if platform.system() == 'Windows':
     import comtypes.client
 
 
 class PdfConverter(object):
-
     def convert(self, file):
         pass
 
@@ -24,7 +24,8 @@ class DocToPdfConverter(PdfConverter):
         # TODO: maybe use contextmanager instead
 
         pdf_path = os.path.join(os.path.abspath(self.temp_dir),
-                                os.path.splitext(os.path.basename(file))[0] + '.pdf')
+                                os.path.splitext(os.path.basename(file))[
+                                    0] + '.pdf')
 
         doc = None
         try:
