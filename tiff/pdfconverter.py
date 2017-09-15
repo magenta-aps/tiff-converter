@@ -1,6 +1,7 @@
 import os
-
-import comtypes.client
+import platform
+if platform.system() == 'Windows':
+    import comtypes.client
 
 
 class PdfConverter(object):
