@@ -3,7 +3,7 @@ import platform
 import subprocess
 
 GS_ARGS = [
-    'gswin32' if platform.system() == 'Windows' else 'gs',
+    'gswin32c' if platform.system() == 'Windows' else 'gs',
     '-q',
     '-dNOPAUSE',
     '-dBATCH',
