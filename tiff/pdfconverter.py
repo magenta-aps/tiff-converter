@@ -23,6 +23,9 @@ class DocToPdfConverter(PdfConverter):
     def convert(self, file: os.path.abspath) -> os.path.abspath:
         # TODO: maybe use contextmanager instead
 
+        if not os.path.isfile(file):
+            raise FileNotFoundError(file + ' not found!')
+
         pdf_path = os.path.join(os.path.abspath(self.temp_dir),
                                 os.path.splitext(os.path.basename(file))[
                                     0] + '.pdf')
