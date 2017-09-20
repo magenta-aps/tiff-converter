@@ -18,10 +18,10 @@ class LocalDocumentManager(DocumentManager):
 
     def get_location(self):
         self.dID += 1
-        if self.dID > DocumentManager.MAX:
+        if self.dID > self.MAX:
             self.dID = 1
             self.dCf += 1
-        if self.dCf > DocumentManager.MAX:
+        if self.dCf > self.MAX:
             self.dCf = 1
             self.mID += 1
         return self.mID, self.dCf, self.dID
