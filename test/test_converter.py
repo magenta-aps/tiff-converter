@@ -3,12 +3,13 @@ import shutil
 import tempfile
 import unittest
 
+import tiff.tiffconverter
 from siarddk.docmanager import LocalDocumentManager
 from tiff.converter import Converter
 
 
+# Skip if Linux
 class TestConverter(unittest.TestCase):
-
     def setUp(self):
         self.source = os.path.abspath('test/resources/root')
         self.target = os.path.join(tempfile.gettempdir(), 'tiff-converter')
@@ -68,25 +69,35 @@ class TestConverter(unittest.TestCase):
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.XYZ.2000.1')))
 
-    @unittest.skip('big bang')
     def test_should_convert_root_folder_correctly(self):
         self.converter.convert()
-
         self.assertTrue(os.path.isfile(
-            os.path.join(target,
-                         'AVID.MAG.1000.1/Documents/docCollection1/1/1.tif')))
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif')))
         self.assertTrue(os.path.isfile(
-            os.path.join(target,
-                         'AVID.MAG.1000.1/Documents/docCollection1/1/2.tif')))
+            os.path.join(self.target,
+                         'AVID.MAG.1000.1', 'Documents', 'docCollection1',
+                         '2', '2.tif')))
         self.assertTrue(os.path.isfile(
-            os.path.join(target,
-                         'AVID.MAG.1000.1/Documents/docCollection1/1/3.tif')))
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '3', '3.tif')))
         self.assertTrue(os.path.isfile(
-            os.path.join(target,
-                         'AVID.MAG.1000.1/Documents/docCollection1/1/4.tif')))
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '4', '4.tif')))
         self.assertFalse(os.path.isfile(
-            os.path.join(target,
-                         'AVID.MAG.1000.1/Documents/docCollection1/1/5.tif')))
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '5', '5.tif')))
+
+    # def test_pdf_conversion_succeeds_but_tiff_conversion_fails(self):
+    #     def tiff_convert_stub(pdf: os.path.abspath,
+    #                           tiff: os.path.abspath) -> bool:
+    #         if pdf == os.path.join(tempfile.gettempdir(), 'sample2.pdf'):
+    #             return False
+    #         else:
+    #             return tiff.tiffconverter.convert(pdf, tiff)
 
 
-        # Run test where MAX is changed from 10000 to 2
+
+            # Run test where MAX is changed from 10000 to 2
+            # Test case where doc-to-pdf ok, but pdf-to-tiff fails
+            # Det kan fejle, hvis man ikke rydder temp kataloget efter hver konvert
