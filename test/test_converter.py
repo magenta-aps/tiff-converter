@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import tempfile
 import unittest
@@ -9,7 +10,7 @@ from siarddk.docmanager import LocalDocumentManager
 from tiff.converter import Converter
 
 
-# Skip if Linux
+@unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
 class TestConverter(unittest.TestCase):
     def setUp(self):
         self.source = os.path.abspath('test/resources/root')
