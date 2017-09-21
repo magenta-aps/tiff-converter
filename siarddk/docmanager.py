@@ -12,16 +12,20 @@ class DocumentManager(object):
 class LocalDocumentManager(DocumentManager):
 
     def __init__(self):
-        self.dID = 0
+        self.dID = 1
         self.dCf = 1
         self.mID = 1
 
     def get_location(self):
-        self.dID += 1
-        if self.dID > self.MAX:
-            self.dID = 1
+        dID = self.dID
+        dCf = self.dCf
+        mID = self.mID
+
+        if self.dID % self.MAX == 0:
+            if self.dCf % self.MAX == 0:
+                self.mID += 1
             self.dCf += 1
-        if self.dCf > self.MAX:
-            self.dCf = 1
-            self.mID += 1
-        return self.mID, self.dCf, self.dID
+
+        self.dID += 1
+
+        return mID, dCf, dID
