@@ -2,8 +2,9 @@ import os
 import shutil
 import tempfile
 import unittest
+import mock
 
-import tiff.tiffconverter
+from tiff.tiffconverter import convert as true_tiff_convert
 from siarddk.docmanager import LocalDocumentManager
 from tiff.converter import Converter
 
@@ -88,16 +89,32 @@ class TestConverter(unittest.TestCase):
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '5', '5.tif')))
 
-    # def test_pdf_conversion_succeeds_but_tiff_conversion_fails(self):
-    #     def tiff_convert_stub(pdf: os.path.abspath,
-    #                           tiff: os.path.abspath) -> bool:
-    #         if pdf == os.path.join(tempfile.gettempdir(), 'sample2.pdf'):
-    #             return False
-    #         else:
-    #             return tiff.tiffconverter.convert(pdf, tiff)
+    @mock.patch('tiff.tiffconverter.convert')
+    def test_pdf_conversion_succeeds_tiff_conversion_fails(self, mock_convert):
+        def tiff_convert_stub(pdf: os.path.abspath,
+                              tiff: os.path.abspath) -> bool:
+            if os.path.basename(pdf) == 'sample2.pdf':
+                return False
+            else:
+                return true_tiff_convert(pdf, tiff)
+
+        mock_convert.side_effect = tiff_convert_stub
+
+        self.converter.convert()
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.target,
+                         'AVID.MAG.1000.1', 'Documents', 'docCollection1',
+                         '2', '2.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '3', '3.tif')))
 
 
 
-            # Run test where MAX is changed from 10000 to 2
+
+        # Run test where MAX is changed from 10000 to 2
             # Test case where doc-to-pdf ok, but pdf-to-tiff fails
             # Det kan fejle, hvis man ikke rydder temp kataloget efter hver konvert

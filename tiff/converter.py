@@ -42,9 +42,8 @@ class Converter(object):
             pdf = pdfconverter.convert(next_file)
             if pdf:
                 # Check for errors
-                tif = tiff.tiffconverter.convert(
+                success = tiff.tiffconverter.convert(
                     pdf, os.path.join(folder, '%s.tif' % dID))
-                success = True
             else:
                 success = False
                 # Do logging
