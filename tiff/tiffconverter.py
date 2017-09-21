@@ -23,6 +23,7 @@ def convert(pdf: os.path.abspath, tiff: os.path.abspath) -> bool:
     subprocess.call(shell_command, shell=True, stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE)
     if os.path.isfile(temp_tiff):
+        # Conversion succeeded
         subprocess.call('convert ' + temp_tiff + ' -compress lzw ' + tiff,
                         shell=True)
         if os.path.isfile(tiff):

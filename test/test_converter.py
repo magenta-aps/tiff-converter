@@ -14,18 +14,27 @@ class TestConverter(unittest.TestCase):
     def setUp(self):
         self.source = os.path.abspath('test/resources/root')
         self.target = os.path.join(tempfile.gettempdir(), 'tiff-converter')
-        self.converter = Converter(self.source, self.target, 'AVID.MAG.1000',
+        if os.path.isdir(self.target):
+            shutil.rmtree(self.target)
+        self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
+        self.converter = Converter(self.source, self.target,
+                                   self.conversion_dir, 'AVID.MAG.1000',
                                    LocalDocumentManager())
 
     def tearDown(self):
         if os.path.isdir(self.target):
             shutil.rmtree(self.target)
+        if os.path.isdir(self.conversion_dir):
+            shutil.rmtree(self.conversion_dir)
 
     def test_should_store_source_in_attribute(self):
         self.assertEqual(self.source, self.converter.source)
 
     def test_should_store_target_in_attribute(self):
         self.assertEqual(self.target, self.converter.target)
+
+    def test_should_store_temp_conversion_folder(self):
+        self.assertEqual(self.conversion_dir, self.converter.conversion_dir)
 
     def test_should_create_folders_AVID_MAG_1000_1_and_Document(self):
         self.converter.convert()
@@ -64,7 +73,8 @@ class TestConverter(unittest.TestCase):
                          'docCollection1', '2')))
 
     def test_should_create_folder_AVID_XYZ_2000_1(self):
-        self.converter = Converter(self.source, self.target, 'AVID.XYZ.2000',
+        self.converter = Converter(self.source, self.target,
+                                   self.conversion_dir, 'AVID.XYZ.2000',
                                    LocalDocumentManager())
         self.converter.convert()
         self.assertTrue(os.path.isdir(
@@ -135,8 +145,18 @@ class TestConverter(unittest.TestCase):
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '3', '3.tif')))
 
+    def test_should_delete_temporary_files_after_conversion(self):
+        self.source = os.path.abspath('test/resources/root2')
+        self.converter = Converter(self.source, self.target,
+                                   self.conversion_dir, 'AVID.MAG.1000',
+                                   LocalDocumentManager())
+        self.converter.convert()
+        self.assertEqual([], os.listdir(self.conversion_dir))
 
-
-
-        # Run test where MAX is changed from 10000 to 2
-        # Det kan fejle, hvis man ikke rydder temp kataloget efter hver konvert
+    def test_should_clean_conversion_folder_in_constructor(self):
+        os.mkdir(os.path.join(self.conversion_dir, 'folder'))
+        open(os.path.join(self.conversion_dir, 'file.empty'), 'w').close()
+        self.converter = Converter(self.source, self.target,
+                                   self.conversion_dir, 'AVID.MAG.1000',
+                                   LocalDocumentManager())
+        self.assertEqual([], os.listdir(self.conversion_dir))
