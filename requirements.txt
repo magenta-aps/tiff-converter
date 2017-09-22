@@ -1,2 +1,5 @@
 comtypes
 mock
+click
+lxml
+
