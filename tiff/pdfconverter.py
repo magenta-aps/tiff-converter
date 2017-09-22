@@ -1,5 +1,11 @@
+import logging
+import logging.config
 import os
 import platform
+
+
+logging.config.fileConfig('logging.conf')
+logger = logging.getLogger('root')
 
 if platform.system() == 'Windows':
     import comtypes.client
@@ -24,6 +30,7 @@ class DocToPdfConverter(PdfConverter):
         # TODO: maybe use contextmanager instead
 
         if not os.path.isfile(file):
+            logger.critical(file + ' not found!')
             raise FileNotFoundError(file + ' not found!')
 
         pdf_path = os.path.join(os.path.abspath(self.temp_dir),
@@ -34,12 +41,15 @@ class DocToPdfConverter(PdfConverter):
         try:
             doc = self.word.Documents.Open(file)
             doc.SaveAs(pdf_path, FileFormat=DocToPdfConverter.WD_FORMAT_PDF)
+            logger.info('Successfully converted %s to PDF' % file)
             return pdf_path
         except Exception as e:
+            logger.error('Could not convert %s to PDF' % file)
             return None
         finally:
             if doc:
                 doc.Close()
 
     def close(self):
+        logger.info('Closed Word application')
         self.word.Quit()
