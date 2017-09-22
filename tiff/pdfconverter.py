@@ -1,11 +1,8 @@
-import logging
-import logging.config
 import os
 import platform
 
+from util.logger import logger
 
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('root')
 
 if platform.system() == 'Windows':
     import comtypes.client
@@ -24,7 +21,9 @@ class DocToPdfConverter(PdfConverter):
 
     def __init__(self, temp_dir: os.path.abspath):
         self.temp_dir = temp_dir
+        logger.info('Opening Word application...')
         self.word = comtypes.client.CreateObject('Word.Application')
+        logger.info('Opened Word application')
 
     def convert(self, file: os.path.abspath) -> os.path.abspath:
         # TODO: maybe use contextmanager instead
@@ -39,6 +38,7 @@ class DocToPdfConverter(PdfConverter):
 
         doc = None
         try:
+            logger.debug('Opening %s ...' % file)
             doc = self.word.Documents.Open(file)
             doc.SaveAs(pdf_path, FileFormat=DocToPdfConverter.WD_FORMAT_PDF)
             logger.info('Successfully converted %s to PDF' % file)
@@ -49,7 +49,9 @@ class DocToPdfConverter(PdfConverter):
         finally:
             if doc:
                 doc.Close()
+                logger.debug('Closed %s' % file)
 
     def close(self):
-        logger.info('Closed Word application')
+        logger.info('Closing Word application...')
         self.word.Quit()
+        logger.info('Closed Word application')

@@ -6,6 +6,8 @@ import tiff.filehandler
 import tiff.pdfconverter
 import tiff.tiffconverter
 
+from util.logger import logger
+
 
 class Converter(object):
     def __init__(
@@ -28,9 +30,10 @@ class Converter(object):
             pass
         os.makedirs(self.conversion_dir)
 
-        # Field to store errors
+        logger.info('Initialized Converter')
 
     def convert(self):
+        logger.info('Starting conversion...')
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
         pdfconverter = tiff.pdfconverter.DocToPdfConverter(self.conversion_dir)
 
@@ -50,7 +53,6 @@ class Converter(object):
             # Convert file to PDF
             pdf = pdfconverter.convert(next_file)
             if pdf:
-                # Check for errors
                 success = tiff.tiffconverter.convert(
                     pdf, os.path.join(folder, '%s.tif' % dID))
             else:
@@ -62,8 +64,7 @@ class Converter(object):
                 if os.path.isfile(f):
                     os.remove(f)
 
-            # Do logging
-
             next_file = filehandler.get_next_file()
 
+        logger.info('Conversion done!')
         pdfconverter.close()
