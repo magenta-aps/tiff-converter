@@ -2,5 +2,5 @@
 venv
 *.pyc
 pdfs
-doc*
+doc[0-9]*
 
