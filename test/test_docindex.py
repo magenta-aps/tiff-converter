@@ -9,9 +9,9 @@ class TestDocIndexBuilder(unittest.TestCase):
     def setUp(self):
         self.builder = DocIndexBuilder()
         self.docIndex_tag = etree.QName(self.builder.build())
-        self.builder.add_doc('1', '1', '1', 'name.tif', 'tif')
+        self.builder.add_doc('1', 'docCollection1', '1', 'name.tif', 'tif')
         self.doc1 = self.builder.build()[0]
-        self.builder.add_doc('2', '2', '2', 'name2.jpg', 'jpg')
+        self.builder.add_doc('2', 'docCollection2', '2', 'name2.jpg', 'wav')
         self.doc2 = self.builder.build()[1]
 
     # Testing that the docIndex element is constructed correctly
@@ -36,32 +36,32 @@ class TestDocIndexBuilder(unittest.TestCase):
         self.assertEqual('doc', tag.localname)
         self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
 
-    def test_1st_doc_should_have_child_mID(self):
-        tag = etree.QName(self.doc1[0])
-        self.assertEqual('mID', tag.localname)
-        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
-
-    def test_1st_mID_should_contain_1(self):
-        mID = self.doc1[0]
-        self.assertEqual('1', mID.text)
-
-    def test_1st_doc_should_have_child_dCf(self):
-        tag = etree.QName(self.doc1[1])
-        self.assertEqual('dCf', tag.localname)
-        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
-
-    def test_1st_dCf_should_contain_1(self):
-        dCf = self.doc1[1]
-        self.assertEqual('1', dCf.text)
-
     def test_1st_doc_should_have_child_dID(self):
-        tag = etree.QName(self.doc1[2])
+        tag = etree.QName(self.doc1[0])
         self.assertEqual('dID', tag.localname)
         self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
 
     def test_1st_dID_should_contain_1(self):
-        dID = self.doc1[2]
+        dID = self.doc1[0]
         self.assertEqual('1', dID.text)
+
+    def test_1st_doc_should_have_child_mID(self):
+        tag = etree.QName(self.doc1[1])
+        self.assertEqual('mID', tag.localname)
+        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
+
+    def test_1st_mID_should_contain_1(self):
+        mID = self.doc1[1]
+        self.assertEqual('1', mID.text)
+
+    def test_1st_doc_should_have_child_dCf(self):
+        tag = etree.QName(self.doc1[2])
+        self.assertEqual('dCf', tag.localname)
+        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
+
+    def test_1st_dCf_should_contain_1(self):
+        dCf = self.doc1[2]
+        self.assertEqual('docCollection1', dCf.text)
 
     def test_1st_doc_should_have_child_oFn(self):
         tag = etree.QName(self.doc1[3])
@@ -86,32 +86,32 @@ class TestDocIndexBuilder(unittest.TestCase):
         self.assertEqual('doc', tag.localname)
         self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
 
-    def test_2nd_doc_should_have_child_mID(self):
-        tag = etree.QName(self.doc2[0])
-        self.assertEqual('mID', tag.localname)
-        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
-
-    def test_2nd_mID_should_contain_2(self):
-        mID = self.doc2[0]
-        self.assertEqual('2', mID.text)
-
-    def test_2nd_doc_should_have_child_dCf(self):
-        tag = etree.QName(self.doc2[1])
-        self.assertEqual('dCf', tag.localname)
-        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
-
-    def test_2nd_dCf_should_contain_2(self):
-        dCf = self.doc2[1]
-        self.assertEqual('2', dCf.text)
-
     def test_2nd_doc_should_have_child_dID(self):
-        tag = etree.QName(self.doc2[2])
+        tag = etree.QName(self.doc2[0])
         self.assertEqual('dID', tag.localname)
         self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
 
     def test_2nd_dID_should_contain_2(self):
-        dID = self.doc2[2]
+        dID = self.doc2[0]
         self.assertEqual('2', dID.text)
+
+    def test_2nd_doc_should_have_child_mID(self):
+        tag = etree.QName(self.doc2[1])
+        self.assertEqual('mID', tag.localname)
+        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
+
+    def test_2nd_mID_should_contain_2(self):
+        mID = self.doc2[1]
+        self.assertEqual('2', mID.text)
+
+    def test_2nd_doc_should_have_child_dCf(self):
+        tag = etree.QName(self.doc2[2])
+        self.assertEqual('dCf', tag.localname)
+        self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
+
+    def test_2nd_dCf_should_contain_2(self):
+        dCf = self.doc2[2]
+        self.assertEqual('docCollection2', dCf.text)
 
     def test_2nd_doc_should_have_child_oFn(self):
         tag = etree.QName(self.doc2[3])
@@ -127,6 +127,6 @@ class TestDocIndexBuilder(unittest.TestCase):
         self.assertEqual('aFt', tag.localname)
         self.assertEqual('http://www.sa.dk/xmlns/diark/1.0', tag.namespace)
 
-    def test_1st_aFt_should_contain_name(self):
+    def test_2nd_aFt_should_contain_name(self):
         oFn = self.doc2[4]
-        self.assertEqual('jpg', oFn.text)
+        self.assertEqual('wav', oFn.text)
