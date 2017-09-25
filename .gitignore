@@ -1,4 +1,6 @@
 .idea/
+.coverage
+htmlcov
 venv
 *.pyc
 pdfs
