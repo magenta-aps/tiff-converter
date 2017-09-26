@@ -161,3 +161,26 @@ class TestConverter(unittest.TestCase):
                                    self.conversion_dir, 'AVID.MAG.1000',
                                    LocalDocumentManager())
         self.assertEqual([], os.listdir(self.conversion_dir))
+
+    def test_should_create_docIndex(self):
+        self.converter.convert()
+        expected = '<docIndex xmlns:xsi="http://www.w3.org/2001/XMLSchema-' \
+                   'instance" xmlns="http://www.sa.dk/xmlns/diark/1.0" ' \
+                   'xsi:schemaLocation="http://www.sa.dk/xmlns/diark/1.0 ' \
+                   '../Schemas/standard/docIndex.xsd"><doc><dID>1</dID>' \
+                   '<mID>1</mID><dCf>docCollection1</dCf>' \
+                   '<oFn>sample1.docx</oFn>' \
+                   '<aFt>tif</aFt></doc><doc><dID>2</dID><mID>1</mID>' \
+                   '<dCf>docCollection1</dCf><oFn>sample2.docx</oFn>' \
+                   '<aFt>tif</aFt></doc><doc><dID>3</dID>' \
+                   '<mID>1</mID><dCf>docCollection1</dCf>' \
+                   '<oFn>sample1.docx</oFn>' \
+                   '<aFt>tif</aFt></doc><doc><dID>4</dID><mID>1</mID>' \
+                   '<dCf>docCollection1</dCf><oFn>sample2.docx</oFn>' \
+                   '<aFt>tif</aFt></doc></docIndex>'
+        docIndex = os.path.join(self.target, 'AVID.MAG.1000.1', 'Indices',
+                                'docIndex.xml')
+        self.assertTrue(os.path.isfile(docIndex))
+        with open(docIndex, 'r') as docindex:
+            content = docindex.read()
+        self.assertEqual(expected, content)

@@ -13,7 +13,7 @@ class LocalFileHandler(FileHandler):
         self.walk = os.walk(basedir)
         self.root, self.dirs, self.files = next(self.walk)
 
-    def get_next_file(self):
+    def get_next_file(self) -> os.path:
         if self.files:
             filename = self.files.pop(0)
             return os.path.join(self.root, filename)

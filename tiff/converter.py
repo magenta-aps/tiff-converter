@@ -2,6 +2,7 @@ import os
 import shutil
 
 import siarddk.docmanager
+import siarddk.docindex
 import tiff.filehandler
 import tiff.pdfconverter
 import tiff.tiffconverter
@@ -36,6 +37,7 @@ class Converter(object):
         logger.info('Starting conversion...')
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
         pdfconverter = tiff.pdfconverter.DocToPdfConverter(self.conversion_dir)
+        docindex_builder = siarddk.docindex.DocIndexBuilder()
 
         success = True
         next_file = filehandler.get_next_file()
@@ -55,6 +57,10 @@ class Converter(object):
             if pdf:
                 success = tiff.tiffconverter.convert(
                     pdf, os.path.join(folder, '%s.tif' % dID))
+                if success:
+                    oFn = os.path.basename(next_file)
+                    docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,
+                                             str(dID), oFn, 'tif')
             else:
                 success = False
 
@@ -66,5 +72,14 @@ class Converter(object):
 
             next_file = filehandler.get_next_file()
 
-        logger.info('Conversion done!')
+        # Write docIndex to file
+        logger.info('Writing docIndex.xml to disk...')
+        indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
+        os.mkdir(indices_path)
+        docindex_path = os.path.join(indices_path, 'docIndex.xml')
+        with open(docindex_path, 'w') as docindex:
+            docindex.write(docindex_builder.to_string())
+        logger.info('docIndex.xml written to disk')
+
         pdfconverter.close()
+        logger.info('Conversion done!')
