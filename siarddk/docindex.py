@@ -48,7 +48,7 @@ class DocIndexBuilder(object):
         return self.docIndex
 
     def to_string(self):
-        pass
+        return str(etree.tostring(self.build()), 'utf-8')
 
     def _add_doc_child(self, doc_element: etree.Element, name: str, value: str):
         tag = etree.QName(self.NS, name)

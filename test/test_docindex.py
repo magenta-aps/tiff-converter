@@ -130,3 +130,14 @@ class TestDocIndexBuilder(unittest.TestCase):
     def test_2nd_aFt_should_contain_name(self):
         oFn = self.doc2[4]
         self.assertEqual('wav', oFn.text)
+
+    def test_should_return_string_representation(self):
+        expected = '<docIndex xmlns:xsi="http://www.w3.org/2001/XMLSchema-' \
+                   'instance" xmlns="http://www.sa.dk/xmlns/diark/1.0" ' \
+                   'xsi:schemaLocation="http://www.sa.dk/xmlns/diark/1.0 ' \
+                   '../Schemas/standard/docIndex.xsd"><doc><dID>1</dID>' \
+                   '<mID>1</mID><dCf>docCollection1</dCf><oFn>name.tif</oFn>' \
+                   '<aFt>tif</aFt></doc><doc><dID>2</dID><mID>2</mID>' \
+                   '<dCf>docCollection2</dCf><oFn>name2.jpg</oFn>' \
+                   '<aFt>wav</aFt></doc></docIndex>'
+        self.assertEqual(expected, self.builder.to_string())
