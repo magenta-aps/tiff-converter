@@ -12,7 +12,8 @@ from util.logger import logger
 
 class Converter(object):
     def __init__(
-            self, source: os.path.abspath,
+            self,
+            source: os.path.abspath,
             target: os.path.abspath,
             conversion_dir: os.path.abspath,
             name: str,
