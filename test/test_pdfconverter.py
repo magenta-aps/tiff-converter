@@ -3,14 +3,15 @@ import platform
 import tempfile
 import unittest
 
-from tiff.pdfconverter import DocToPdfConverter
+from tiff.pdfconverter import MSOfficeToPdfConverter
 
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
-class TestDocToPdfConverter(unittest.TestCase):
+class TestMSOfficeToPdfConverter(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.gettempdir()
-        self.converter = DocToPdfConverter(self.temp_dir)
+        self.converter = MSOfficeToPdfConverter(self.temp_dir,
+                                                'Word.Application')
 
     def test_should_return_tmp_doc1_pdf(self):
         doc_path = os.path.abspath('test/resources/root/folder1/sample1.docx')

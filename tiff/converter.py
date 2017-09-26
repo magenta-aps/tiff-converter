@@ -37,7 +37,8 @@ class Converter(object):
     def convert(self):
         logger.info('Starting conversion...')
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
-        pdfconverter = tiff.pdfconverter.DocToPdfConverter(self.conversion_dir)
+        pdfconverter = tiff.pdfconverter.MSOfficeToPdfConverter(
+            self.conversion_dir, 'Word.Application')
         docindex_builder = siarddk.docindex.DocIndexBuilder()
 
         success = True

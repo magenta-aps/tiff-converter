@@ -8,21 +8,13 @@ if platform.system() == 'Windows':
     import comtypes.client
 
 
-class PdfConverter(object):
-    def convert(self, file):
-        pass
-
-    def close(self):
-        pass
-
-
-class DocToPdfConverter(PdfConverter):
+class MSOfficeToPdfConverter(object):
     WD_FORMAT_PDF = 17
 
-    def __init__(self, temp_dir: os.path.abspath):
+    def __init__(self, temp_dir: os.path.abspath, application: str):
         self.temp_dir = temp_dir
         logger.info('Opening Word application...')
-        self.word = comtypes.client.CreateObject('Word.Application')
+        self.app = comtypes.client.CreateObject(application)
         logger.info('Opened Word application')
 
     def convert(self, file: os.path.abspath) -> os.path.abspath:
@@ -39,8 +31,8 @@ class DocToPdfConverter(PdfConverter):
         doc = None
         try:
             logger.debug('Opening %s ...' % file)
-            doc = self.word.Documents.Open(file)
-            doc.SaveAs(pdf_path, FileFormat=DocToPdfConverter.WD_FORMAT_PDF)
+            doc = self.app.Documents.Open(file)
+            doc.SaveAs(pdf_path, FileFormat=MSOfficeToPdfConverter.WD_FORMAT_PDF)
             logger.info('Successfully converted %s to PDF' % file)
             return pdf_path
         except Exception as e:
@@ -53,5 +45,13 @@ class DocToPdfConverter(PdfConverter):
 
     def close(self):
         logger.info('Closing Word application...')
-        self.word.Quit()
+        self.app.Quit()
         logger.info('Closed Word application')
+
+
+class PdfConverter(object):
+    def convert(self, file):
+        pass
+
+    def close(self):
+        pass
