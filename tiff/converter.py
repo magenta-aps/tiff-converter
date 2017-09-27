@@ -4,7 +4,7 @@ import shutil
 import siarddk.docmanager
 import siarddk.docindex
 import tiff.filehandler
-import tiff.pdfconverter
+from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
 
 from util.logger import logger
@@ -37,8 +37,8 @@ class Converter(object):
     def convert(self):
         logger.info('Starting conversion...')
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
-        pdfconverter = tiff.pdfconverter.MSOfficeToPdfConverter(
-            self.conversion_dir, 'Word.Application')
+        pdfconverter = MSOfficeToPdfConverter(self.conversion_dir,
+                                              MSOfficeToPdfConverter.WORD)
         docindex_builder = siarddk.docindex.DocIndexBuilder()
 
         success = True

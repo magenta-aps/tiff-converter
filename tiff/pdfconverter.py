@@ -3,19 +3,21 @@ import platform
 
 from util.logger import logger
 
-
 if platform.system() == 'Windows':
     import comtypes.client
 
 
 class MSOfficeToPdfConverter(object):
+    WORD = 'Word.Application'
+    EXCEL = 'Excel.Application'
     WD_FORMAT_PDF = 17
 
     def __init__(self, temp_dir: os.path.abspath, application: str):
         self.temp_dir = temp_dir
-        logger.info('Opening Word application...')
+        self.application = application
+        logger.info('Opening %s...' % application)
         self.app = comtypes.client.CreateObject(application)
-        logger.info('Opened Word application')
+        logger.info('Opened %s' % application)
 
     def convert(self, file: os.path.abspath) -> os.path.abspath:
         # TODO: maybe use contextmanager instead
@@ -31,8 +33,13 @@ class MSOfficeToPdfConverter(object):
         doc = None
         try:
             logger.debug('Opening %s ...' % file)
-            doc = self.app.Documents.Open(file)
-            doc.SaveAs(pdf_path, FileFormat=MSOfficeToPdfConverter.WD_FORMAT_PDF)
+            if self.application == self.WORD:
+                doc = self.app.Documents.Open(file)
+                doc.SaveAs(pdf_path,
+                           FileFormat=MSOfficeToPdfConverter.WD_FORMAT_PDF)
+            elif self.application == self.EXCEL:
+                doc = self.app.Workbooks.Open(file)
+                doc.ExportAsFixedFormat(0, pdf_path, 1, 0)
             logger.info('Successfully converted %s to PDF' % file)
             return pdf_path
         except Exception as e:
@@ -44,9 +51,9 @@ class MSOfficeToPdfConverter(object):
                 logger.debug('Closed %s' % file)
 
     def close(self):
-        logger.info('Closing Word application...')
+        logger.info('Closing %s...' % self.application)
         self.app.Quit()
-        logger.info('Closed Word application')
+        logger.info('Closed %s' % self.application)
 
 
 class PdfConverter(object):

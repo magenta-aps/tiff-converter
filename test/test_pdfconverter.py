@@ -11,7 +11,7 @@ class TestMSOfficeToPdfConverter(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.gettempdir()
         self.converter = MSOfficeToPdfConverter(self.temp_dir,
-                                                'Word.Application')
+                                                MSOfficeToPdfConverter.WORD)
 
     def test_should_return_tmp_doc1_pdf(self):
         doc_path = os.path.abspath('test/resources/root/folder1/sample1.docx')
@@ -34,3 +34,16 @@ class TestMSOfficeToPdfConverter(unittest.TestCase):
 
     def tearDown(self):
         self.converter.close()
+
+
+@unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
+class TestPdfConverter(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.gettempdir()
+        self.converter = MSOfficeToPdfConverter(self.temp_dir,
+                                                MSOfficeToPdfConverter.EXCEL)
+
+    def test_should_return_tmp_xls1_pdf(self):
+        xls_path = os.path.abspath('test/resources/root3/spreadsheet1.xlsx')
+        self.assertEqual(os.path.join(self.temp_dir, 'spreadsheet1.pdf'),
+                         self.converter.convert(xls_path))
