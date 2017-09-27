@@ -15,7 +15,8 @@ print(infile)
 print(outfile)
 
 doc = app.Workbooks.Open(infile)
-doc.SaveAs(outfile, FileFormat=FORMAT_PDF)
+# doc.SaveAs(outfile, FileFormat=FORMAT_PDF)
+doc.ExportAsFixedFormat(0, outfile, 1, 0)
 doc.Close()
 
 app.Quit()
