@@ -38,37 +38,37 @@ class TestConverter(unittest.TestCase):
         self.assertEqual(self.conversion_dir, self.converter.conversion_dir)
 
     def test_should_create_folders_AVID_MAG_1000_1_and_Document(self):
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents')))
 
     def test_should_create_folder_AVID_MAG_1000_2_and_Documents(self):
         self.converter.docmanager.MAX = 2
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents')))
 
     def test_folder_docCollection1_should_exists_after_file_conversion(self):
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1')))
 
     def test_folder_docCollection2_should_exists_after_file_conversion2(self):
         self.converter.docmanager.MAX = 2
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection2')))
 
     def test_docCollection1_1_should_exist_after_file_conversion(self):
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '1')))
 
     def test_docCollection1_2_should_exist_after_file_conversion(self):
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '2')))
@@ -77,12 +77,12 @@ class TestConverter(unittest.TestCase):
         self.converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.XYZ.2000',
                                    LocalDocumentManager())
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.XYZ.2000.1')))
 
     def test_should_convert_root_folder_correctly(self):
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '1', '1.tif')))
@@ -102,7 +102,7 @@ class TestConverter(unittest.TestCase):
 
     def test_should_convert_root_folder_correctly_when_MAX_2(self):
         self.converter.docmanager.MAX = 2
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '1', '1.tif')))
@@ -134,7 +134,7 @@ class TestConverter(unittest.TestCase):
 
         mock_convert.side_effect = tiff_convert_stub
 
-        self.converter.convert()
+        self.converter.run()
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '1', '1.tif')))
@@ -151,7 +151,7 @@ class TestConverter(unittest.TestCase):
         self.converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.MAG.1000',
                                    LocalDocumentManager())
-        self.converter.convert()
+        self.converter.run()
         self.assertEqual([], os.listdir(self.conversion_dir))
 
     def test_should_clean_conversion_folder_in_constructor(self):
@@ -163,7 +163,7 @@ class TestConverter(unittest.TestCase):
         self.assertEqual([], os.listdir(self.conversion_dir))
 
     def test_should_create_docIndex(self):
-        self.converter.convert()
+        self.converter.run()
         expected = '<docIndex xmlns:xsi="http://www.w3.org/2001/XMLSchema-' \
                    'instance" xmlns="http://www.sa.dk/xmlns/diark/1.0" ' \
                    'xsi:schemaLocation="http://www.sa.dk/xmlns/diark/1.0 ' \

@@ -32,7 +32,7 @@ def start_conversion(source, target, tempdir, name):
 
     converter = tiff.converter.Converter(source, target, tempdir, name,
                                          LocalDocumentManager())
-    converter.convert()
+    converter.run()
 
 
 if __name__ == '__main__':

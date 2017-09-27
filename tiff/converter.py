@@ -10,6 +10,11 @@ import tiff.tiffconverter
 from util.logger import logger
 
 
+class CompositeConverter(object):
+    pass
+    # def convert
+
+
 class Converter(object):
     def __init__(
             self,
@@ -34,7 +39,7 @@ class Converter(object):
 
         logger.info('Initialized Converter')
 
-    def convert(self):
+    def run(self):
         logger.info('Starting conversion...')
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
         pdfconverter = MSOfficeToPdfConverter(self.conversion_dir,
@@ -54,6 +59,8 @@ class Converter(object):
             if not os.path.isdir(folder):
                 os.makedirs(folder)
 
+            ###################################
+
             # Convert file to PDF
             pdf = pdfconverter.convert(next_file)
             if pdf:
@@ -65,6 +72,8 @@ class Converter(object):
                                              str(dID), oFn, 'tif')
             else:
                 success = False
+
+            ####################################
 
             # Clean up conversion folder
             for f in os.listdir(self.conversion_dir):
