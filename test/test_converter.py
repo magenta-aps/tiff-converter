@@ -28,14 +28,18 @@ class TestConverter(unittest.TestCase):
         if os.path.isdir(self.conversion_dir):
             shutil.rmtree(self.conversion_dir)
 
+
     def test_should_store_source_in_attribute(self):
         self.assertEqual(self.source, self.converter.source)
+        self.converter.close()
 
     def test_should_store_target_in_attribute(self):
         self.assertEqual(self.target, self.converter.target)
+        self.converter.close()
 
     def test_should_store_temp_conversion_folder(self):
         self.assertEqual(self.conversion_dir, self.converter.conversion_dir)
+        self.converter.close()
 
     def test_should_create_folders_AVID_MAG_1000_1_and_Document(self):
         self.converter.run()
@@ -74,10 +78,11 @@ class TestConverter(unittest.TestCase):
                          'docCollection1', '2')))
 
     def test_should_create_folder_AVID_XYZ_2000_1(self):
-        self.converter = Converter(self.source, self.target,
+        converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.XYZ.2000',
                                    LocalDocumentManager())
-        self.converter.run()
+        converter.run()
+        self.converter.close()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.XYZ.2000.1')))
 
@@ -148,18 +153,21 @@ class TestConverter(unittest.TestCase):
 
     def test_should_delete_temporary_files_after_conversion(self):
         self.source = os.path.abspath('test/resources/root2')
-        self.converter = Converter(self.source, self.target,
+        converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.MAG.1000',
                                    LocalDocumentManager())
-        self.converter.run()
+        converter.run()
+        self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
 
     def test_should_clean_conversion_folder_in_constructor(self):
         os.mkdir(os.path.join(self.conversion_dir, 'folder'))
         open(os.path.join(self.conversion_dir, 'file.empty'), 'w').close()
-        self.converter = Converter(self.source, self.target,
+        converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.MAG.1000',
                                    LocalDocumentManager())
+        converter.close()
+        self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
 
     def test_should_create_docIndex(self):

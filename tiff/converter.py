@@ -52,6 +52,9 @@ class Converter(object):
 
         logger.info('Initialized Converter')
 
+    def close(self):
+        self.complex_converter.close()
+
     def run(self):
         logger.info('Starting conversion...')
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
@@ -95,5 +98,5 @@ class Converter(object):
             docindex.write(docindex_builder.to_string())
         logger.info('docIndex.xml written to disk')
 
-        self.complex_converter.close()
+        self.close()
         logger.info('Conversion done!')
