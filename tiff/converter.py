@@ -10,9 +10,21 @@ import tiff.tiffconverter
 from util.logger import logger
 
 
-class CompositeConverter(object):
-    pass
-    # def convert
+class ComplexConverter(object):
+    def __init__(self, conversion_dir: os.path.abspath):
+        self.word_converter = MSOfficeToPdfConverter(conversion_dir,
+                                                     MSOfficeToPdfConverter.WORD)
+
+    def convert(self, source: os.path.abspath, target: os.path.abspath):
+        pdf = self.word_converter.convert(source)
+        if pdf:
+            success = tiff.tiffconverter.convert(pdf, target)
+            return success
+        else:
+            return False
+
+    def close(self):
+        self.word_converter.close()
 
 
 class Converter(object):
@@ -29,6 +41,7 @@ class Converter(object):
         self.conversion_dir = conversion_dir
         self.name = name
         self.docmanager = docmanager
+        self.complex_converter = ComplexConverter(self.conversion_dir)
 
         # Set up conversion folder
         try:
@@ -42,8 +55,6 @@ class Converter(object):
     def run(self):
         logger.info('Starting conversion...')
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
-        pdfconverter = MSOfficeToPdfConverter(self.conversion_dir,
-                                              MSOfficeToPdfConverter.WORD)
         docindex_builder = siarddk.docindex.DocIndexBuilder()
 
         success = True
@@ -59,21 +70,13 @@ class Converter(object):
             if not os.path.isdir(folder):
                 os.makedirs(folder)
 
-            ###################################
-
             # Convert file to PDF
-            pdf = pdfconverter.convert(next_file)
-            if pdf:
-                success = tiff.tiffconverter.convert(
-                    pdf, os.path.join(folder, '%s.tif' % dID))
-                if success:
-                    oFn = os.path.basename(next_file)
-                    docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,
-                                             str(dID), oFn, 'tif')
-            else:
-                success = False
-
-            ####################################
+            success = self.complex_converter.convert(
+                next_file, os.path.join(folder, '%s.tif' % dID))
+            if success:
+                oFn = os.path.basename(next_file)
+                docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,
+                                         str(dID), oFn, 'tif')
 
             # Clean up conversion folder
             for f in os.listdir(self.conversion_dir):
@@ -92,5 +95,5 @@ class Converter(object):
             docindex.write(docindex_builder.to_string())
         logger.info('docIndex.xml written to disk')
 
-        pdfconverter.close()
+        self.complex_converter.close()
         logger.info('Conversion done!')
