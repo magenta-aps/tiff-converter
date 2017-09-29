@@ -1,6 +1,5 @@
 import os
 import shutil
-import tempfile
 
 import siarddk.docmanager
 import siarddk.docindex
@@ -21,12 +20,12 @@ class ComplexConverter(object):
             conversion_dir)
 
     def convert(self, source: os.path.abspath, target: os.path.abspath):
-        ext = os.path.splitext(source)[1][1:]
+        ext = os.path.splitext(source)[1][1:].lower()
 
         pdf = None
-        if ext == 'docx':  # or doc (add test for this)
+        if ext in ['doc', 'docx']:
             pdf = self.word_converter.convert(source)
-        elif ext == 'xlsx':
+        elif ext in ['xls', 'xlsx']:
             pdf = self.excel_converter.convert(source)
         elif ext == 'pdf':
             pdf = source

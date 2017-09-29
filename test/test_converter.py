@@ -15,28 +15,43 @@ class TestComplexConverter(unittest.TestCase):
         self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
         if not os.path.isdir(self.conversion_dir):
             os.makedirs(self.conversion_dir)
+        self.converter = ComplexConverter(self.conversion_dir)
 
     def tearDown(self):
-        if os.path.isdir(self.conversion_dir):
-            shutil.rmtree(self.conversion_dir)
+        self.converter.close()
+        # if os.path.isdir(self.conversion_dir):
+        #     shutil.rmtree(self.conversion_dir)
 
-    def test_should_convert_xls_correctly(self):
-        converter = ComplexConverter(self.conversion_dir)
+    def test_should_convert_xlsx_correctly(self):
         source = os.path.abspath('test/resources/root3/spreadsheet1.xlsx')
         self.assertTrue(
-            converter.convert(source,
+            self.converter.convert(source,
                               os.path.join(self.conversion_dir, 'temp.tif')))
-        converter.close()
 
     def test_should_convert_pdf_correctly(self):
-        converter = ComplexConverter(self.conversion_dir)
         source = os.path.abspath('test/resources/sample.pdf')
         self.assertTrue(
-            converter.convert(source,
+            self.converter.convert(source,
                               os.path.join(self.conversion_dir, 'temp.tif')))
-        converter.close()
 
-# Should handle upper and lower case extensions
+    def test_should_convert_PDF_correctly(self):
+        source = os.path.abspath('test/resources/sample.PDF')
+        self.assertTrue(
+            self.converter.convert(source,
+                              os.path.join(self.conversion_dir, 'temp.tif')))
+
+    def test_should_convert_doc_correctly(self):
+        source = os.path.abspath('test/resources/sample.doc')
+        self.assertTrue(
+            self.converter.convert(source,
+                              os.path.join(self.conversion_dir, 'temp.tif')))
+
+    def test_should_convert_xls_correctly(self):
+        source = os.path.abspath('test/resources/sample.xls')
+        self.assertTrue(
+            self.converter.convert(source,
+                              os.path.join(self.conversion_dir, 'temp.tif')))
+
 # should handle normal doc and xls
 
 
