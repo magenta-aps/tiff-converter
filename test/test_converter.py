@@ -19,8 +19,8 @@ class TestComplexConverter(unittest.TestCase):
 
     def tearDown(self):
         self.converter.close()
-        # if os.path.isdir(self.conversion_dir):
-        #     shutil.rmtree(self.conversion_dir)
+        if os.path.isdir(self.conversion_dir):
+            shutil.rmtree(self.conversion_dir)
 
     def test_should_convert_xlsx_correctly(self):
         source = os.path.abspath('test/resources/root3/spreadsheet1.xlsx')
@@ -51,8 +51,6 @@ class TestComplexConverter(unittest.TestCase):
         self.assertTrue(
             self.converter.convert(source,
                               os.path.join(self.conversion_dir, 'temp.tif')))
-
-# should handle normal doc and xls
 
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
