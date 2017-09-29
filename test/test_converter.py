@@ -28,6 +28,17 @@ class TestComplexConverter(unittest.TestCase):
                               os.path.join(self.conversion_dir, 'temp.tif')))
         converter.close()
 
+    def test_should_convert_pdf_correctly(self):
+        converter = ComplexConverter(self.conversion_dir)
+        source = os.path.abspath('test/resources/sample.pdf')
+        self.assertTrue(
+            converter.convert(source,
+                              os.path.join(self.conversion_dir, 'temp.tif')))
+        converter.close()
+
+# Should handle upper and lower case extensions
+# should handle normal doc and xls
+
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
 class TestConverter(unittest.TestCase):

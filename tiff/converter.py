@@ -28,6 +28,8 @@ class ComplexConverter(object):
             pdf = self.word_converter.convert(source)
         elif ext == 'xlsx':
             pdf = self.excel_converter.convert(source)
+        elif ext == 'pdf':
+            pdf = source
 
         if pdf:
             success = self.pdf_to_tiff_converter.convert(pdf, target)
