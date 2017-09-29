@@ -5,9 +5,28 @@ import tempfile
 import unittest
 import mock
 
-from tiff.tiffconverter import convert as true_tiff_convert
 from siarddk.docmanager import LocalDocumentManager
-from tiff.converter import Converter
+from tiff.converter import Converter, ComplexConverter
+
+
+@unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
+class TestComplexConverter(unittest.TestCase):
+    def setUp(self):
+        self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
+        if not os.path.isdir(self.conversion_dir):
+            os.makedirs(self.conversion_dir)
+
+    def tearDown(self):
+        if os.path.isdir(self.conversion_dir):
+            shutil.rmtree(self.conversion_dir)
+
+    def test_should_convert_xls_correctly(self):
+        converter = ComplexConverter(self.conversion_dir)
+        source = os.path.abspath('test/resources/root3/spreadsheet1.xlsx')
+        self.assertTrue(
+            converter.convert(source,
+                              os.path.join(self.conversion_dir, 'temp.tif')))
+        converter.close()
 
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
@@ -27,7 +46,6 @@ class TestConverter(unittest.TestCase):
             shutil.rmtree(self.target)
         if os.path.isdir(self.conversion_dir):
             shutil.rmtree(self.conversion_dir)
-
 
     def test_should_store_source_in_attribute(self):
         self.assertEqual(self.source, self.converter.source)
@@ -79,8 +97,8 @@ class TestConverter(unittest.TestCase):
 
     def test_should_create_folder_AVID_XYZ_2000_1(self):
         converter = Converter(self.source, self.target,
-                                   self.conversion_dir, 'AVID.XYZ.2000',
-                                   LocalDocumentManager())
+                              self.conversion_dir, 'AVID.XYZ.2000',
+                              LocalDocumentManager())
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(
@@ -128,34 +146,35 @@ class TestConverter(unittest.TestCase):
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection3', '5', '5.tif')))
 
-    @mock.patch('tiff.tiffconverter.convert')
+    @mock.patch('tiff.tiffconverter.TiffConverter.convert')
     def test_pdf_conversion_succeeds_tiff_conversion_fails(self, mock_convert):
-        def tiff_convert_stub(pdf: os.path.abspath,
-                              tiff: os.path.abspath) -> bool:
-            if os.path.basename(pdf) == 'sample2.pdf':
-                return False
-            else:
-                return true_tiff_convert(pdf, tiff)
-
-        mock_convert.side_effect = tiff_convert_stub
+        mock_convert.side_effect = [True, False, True, False]
 
         self.converter.run()
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '1', '1.tif')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.target,
-                         'AVID.MAG.1000.1', 'Documents', 'docCollection1',
-                         '2', '2.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '3', '3.tif')))
+
+        docIndex = self.converter.docindex_builder.build()
+        doc1 = docIndex[0]
+        doc2 = docIndex[1]
+
+        self.assertEqual(2, len(docIndex))
+
+        self.assertEqual('1', doc1[0].text)
+        self.assertEqual('1', doc1[1].text)
+        self.assertEqual('docCollection1', doc1[2].text)
+        self.assertEqual('sample1.docx', doc1[3].text)
+        self.assertEqual('tif', doc1[4].text)
+
+        self.assertEqual('2', doc2[0].text)
+        self.assertEqual('1', doc2[1].text)
+        self.assertEqual('docCollection1', doc2[2].text)
+        self.assertEqual('sample1.docx', doc2[3].text)
+        self.assertEqual('tif', doc1[4].text)
 
     def test_should_delete_temporary_files_after_conversion(self):
         self.source = os.path.abspath('test/resources/root2')
         converter = Converter(self.source, self.target,
-                                   self.conversion_dir, 'AVID.MAG.1000',
-                                   LocalDocumentManager())
+                              self.conversion_dir, 'AVID.MAG.1000',
+                              LocalDocumentManager())
         converter.run()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -164,8 +183,8 @@ class TestConverter(unittest.TestCase):
         os.mkdir(os.path.join(self.conversion_dir, 'folder'))
         open(os.path.join(self.conversion_dir, 'file.empty'), 'w').close()
         converter = Converter(self.source, self.target,
-                                   self.conversion_dir, 'AVID.MAG.1000',
-                                   LocalDocumentManager())
+                              self.conversion_dir, 'AVID.MAG.1000',
+                              LocalDocumentManager())
         converter.close()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))

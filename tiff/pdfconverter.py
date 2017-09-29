@@ -17,6 +17,7 @@ class MSOfficeToPdfConverter(object):
         self.application = application
         logger.info('Opening %s...' % application)
         self.app = comtypes.client.CreateObject(application)
+        self.app.Visible = False
         logger.info('Opened %s' % application)
 
     def convert(self, file: os.path.abspath) -> os.path.abspath:
