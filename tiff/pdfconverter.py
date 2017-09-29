@@ -10,14 +10,17 @@ if platform.system() == 'Windows':
 class MSOfficeToPdfConverter(object):
     WORD = 'Word.Application'
     EXCEL = 'Excel.Application'
+    POWERPOINT = 'Powerpoint.Application'
     WD_FORMAT_PDF = 17
+    PP_FORMAT_PDF = 32
 
     def __init__(self, temp_dir: os.path.abspath, application: str):
         self.temp_dir = temp_dir
         self.application = application
         logger.info('Opening %s...' % application)
         self.app = comtypes.client.CreateObject(application)
-        self.app.Visible = False
+        if not application == self.POWERPOINT:
+            self.app.Visible = False
         logger.info('Opened %s' % application)
 
     def convert(self, file: os.path.abspath) -> os.path.abspath:
@@ -36,13 +39,17 @@ class MSOfficeToPdfConverter(object):
             logger.debug('Opening %s ...' % file)
             if self.application == self.WORD:
                 doc = self.app.Documents.Open(file)
-                doc.SaveAs(pdf_path,
-                           FileFormat=MSOfficeToPdfConverter.WD_FORMAT_PDF)
+                doc.SaveAs(pdf_path, FileFormat=self.WD_FORMAT_PDF)
             elif self.application == self.EXCEL:
                 doc = self.app.Workbooks.Open(file)
                 doc.ExportAsFixedFormat(0, pdf_path, 1, 0)
+            elif self.application == self.POWERPOINT:
+                doc = self.app.Presentations.Open(file)
+                doc.SaveAs(pdf_path, FileFormat=self.PP_FORMAT_PDF)
+
             logger.info('Successfully converted %s to PDF' % file)
             return pdf_path
+
         except Exception as e:
             logger.error('Could not convert %s to PDF' % file)
             return None

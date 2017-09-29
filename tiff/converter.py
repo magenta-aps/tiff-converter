@@ -16,6 +16,8 @@ class ComplexConverter(object):
             conversion_dir, MSOfficeToPdfConverter.WORD)
         self.excel_converter = MSOfficeToPdfConverter(
             conversion_dir, MSOfficeToPdfConverter.EXCEL)
+        self.powerpoint_converter = MSOfficeToPdfConverter(
+            conversion_dir, MSOfficeToPdfConverter.POWERPOINT)
         self.pdf_to_tiff_converter = tiff.tiffconverter.TiffConverter(
             conversion_dir)
 
@@ -27,6 +29,8 @@ class ComplexConverter(object):
             pdf = self.word_converter.convert(source)
         elif ext in ['xls', 'xlsx']:
             pdf = self.excel_converter.convert(source)
+        elif ext in ['ppt', 'pptx']:
+            pdf = self.powerpoint_converter.convert(source)
         elif ext == 'pdf':
             pdf = source
 
@@ -39,6 +43,7 @@ class ComplexConverter(object):
     def close(self):
         self.word_converter.close()
         self.excel_converter.close()
+        self.powerpoint_converter.close()
 
 
 class Converter(object):
@@ -93,7 +98,7 @@ class Converter(object):
             if success:
                 oFn = os.path.basename(next_file)
                 self.docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,
-                                         str(dID), oFn, 'tif')
+                                              str(dID), oFn, 'tif')
 
             # Clean up conversion folder
             for f in os.listdir(self.conversion_dir):
