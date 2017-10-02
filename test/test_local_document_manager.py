@@ -40,6 +40,26 @@ class TestLocalDocumentManager(unittest.TestCase):
         self.add(8)
         self.assertEqual((3, 5, 9), self.d.get_location())
 
+    def test_should_instantiate_with_mID_3(self):
+        d = docmanager.LocalDocumentManager(3, 1, 1)
+        self.assertEqual(3, d.mID)
+
+    def test_should_instantiate_with_dCf_3(self):
+        d = docmanager.LocalDocumentManager(1, 3, 1)
+        self.assertEqual(3, d.dCf)
+
+    def test_should_instantiate_with_dID_3(self):
+        d = docmanager.LocalDocumentManager(1, 1, 3)
+        self.assertEqual(3, d.dID)
+
+    def test_should_raise_exception_if_dCf_greater_than_MAX(self):
+        with self.assertRaises(ValueError):
+            docmanager.LocalDocumentManager(1, 10001, 1)
+
+    def test_should_raise_exception_if_dID_greater_than_MAX(self):
+        with self.assertRaises(ValueError):
+            docmanager.LocalDocumentManager(1, 1, 10001)
+
     def add(self, n):
         """
         Add n docs to Documents

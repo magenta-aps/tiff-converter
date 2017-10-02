@@ -11,10 +11,12 @@ class DocumentManager(object):
 
 class LocalDocumentManager(DocumentManager):
 
-    def __init__(self):
-        self.dID = 1
-        self.dCf = 1
-        self.mID = 1
+    def __init__(self, mID=1, dCf=1, dID=1):
+        if dCf > self.MAX or dID > self.MAX:
+            raise ValueError('dCf cannot be larger than %s', self.MAX)
+        self.mID = mID
+        self.dCf = dCf
+        self.dID = dID
 
     def get_location(self):
         dID = self.dID
