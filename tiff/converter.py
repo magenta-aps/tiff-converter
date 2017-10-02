@@ -18,10 +18,9 @@ class ComplexConverter(object):
             conversion_dir, MSOfficeToPdfConverter.EXCEL)
         self.powerpoint_converter = MSOfficeToPdfConverter(
             conversion_dir, MSOfficeToPdfConverter.POWERPOINT)
-        self.pdf_to_tiff_converter = tiff.tiffconverter.TiffConverter(
-            conversion_dir)
+        self.tiff_converter = tiff.tiffconverter.TiffConverter(conversion_dir)
 
-    def convert(self, source: os.path.abspath, target: os.path.abspath):
+    def convert(self, source: os.path.abspath, target: os.path.abspath) -> bool:
         ext = os.path.splitext(source)[1][1:].lower()
 
         pdf = None
@@ -33,10 +32,11 @@ class ComplexConverter(object):
             pdf = self.powerpoint_converter.convert(source)
         elif ext == 'pdf':
             pdf = source
+        elif ext == 'jpg':
+            return self.tiff_converter.image_magick_convert(source, target)
 
         if pdf:
-            success = self.pdf_to_tiff_converter.pdf_convert(pdf, target)
-            return success
+            return self.tiff_converter.pdf_convert(pdf, target)
         else:
             return False
 

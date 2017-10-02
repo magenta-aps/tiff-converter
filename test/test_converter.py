@@ -64,6 +64,12 @@ class TestComplexConverter(unittest.TestCase):
             self.converter.convert(source,
                               os.path.join(self.conversion_dir, 'temp.tif')))
 
+    def test_should_convert_jpg_correctly(self):
+        source = os.path.abspath('test/resources/sample.jpg')
+        self.assertTrue(
+            self.converter.convert(source,
+                              os.path.join(self.conversion_dir, 'temp.tif')))
+
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
 class TestConverter(unittest.TestCase):
