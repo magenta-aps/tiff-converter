@@ -182,7 +182,7 @@ class TestConverter(unittest.TestCase):
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection3', '5', '5.tif')))
 
-    @mock.patch('tiff.tiffconverter.TiffConverter.convert')
+    @mock.patch('tiff.tiffconverter.TiffConverter.pdf_convert')
     def test_pdf_conversion_succeeds_tiff_conversion_fails(self, mock_convert):
         mock_convert.side_effect = [True, False, True, False]
 

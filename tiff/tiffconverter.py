@@ -20,7 +20,7 @@ class TiffConverter(object):
     def __init__(self, tempdir: os.path.abspath):
         self.tempdir = tempdir
 
-    def convert(self, pdf: os.path.abspath, tiff: os.path.abspath) -> bool:
+    def pdf_convert(self, pdf: os.path.abspath, tiff: os.path.abspath) -> bool:
         temp_tiff = os.path.join(self.tempdir, os.path.basename(tiff))
         shell_command = self.COMMAND + ' -sOutputFile=' + temp_tiff + ' -f ' + pdf
         logger.debug('Converting %s to tiff...' % pdf)
@@ -28,10 +28,17 @@ class TiffConverter(object):
                         stderr=subprocess.PIPE)
         if os.path.isfile(temp_tiff):
             logger.debug('Compressing %s ...' % tiff)
-            subprocess.call('convert ' + temp_tiff + ' -compress lzw ' + tiff,
-                            shell=True)
-            if os.path.isfile(tiff):
-                logger.info('Successfully converted %s to TIFF' % pdf)
-                return True
+            return self.image_magick_convert(temp_tiff, tiff)
         logger.error('Could not convert %s to TIFF' % pdf)
         return False
+
+    @staticmethod
+    def image_magick_convert(infile: os.path.abspath,
+                             tiff: os.path.abspath) -> bool:
+        subprocess.call('convert ' + infile + ' -compress lzw ' + tiff,
+                        shell=True)
+        if os.path.isfile(tiff):
+            logger.info('Successfully converted %s to TIFF' % infile)
+            return True
+        else:
+            return False

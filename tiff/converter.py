@@ -35,7 +35,7 @@ class ComplexConverter(object):
             pdf = source
 
         if pdf:
-            success = self.pdf_to_tiff_converter.convert(pdf, target)
+            success = self.pdf_to_tiff_converter.pdf_convert(pdf, target)
             return success
         else:
             return False

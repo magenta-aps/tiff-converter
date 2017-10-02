@@ -13,12 +13,12 @@ class TestTiffConverter(unittest.TestCase):
     def test_should_convert_pdf_to_tiff(self):
         tiff = os.path.join(self.temp_dir, 'temp.tif')
         self.assertTrue(
-            self.converter.convert('test/resources/sample.pdf', tiff))
+            self.converter.pdf_convert('test/resources/sample.pdf', tiff))
         self.assertTrue(os.path.isfile(tiff))
         os.remove(tiff)
 
     def test_should_return_False_when_conversion_fails(self):
         tiff = os.path.join(self.temp_dir, 'temp.tif')
         self.assertFalse(
-            self.converter.convert('test/resources/corrupted.pdf', tiff))
+            self.converter.pdf_convert('test/resources/corrupted.pdf', tiff))
         self.assertFalse(os.path.isfile(tiff))
