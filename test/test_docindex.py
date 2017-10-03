@@ -1,8 +1,55 @@
+import os
+import tempfile
 import unittest
 
 from lxml import etree
 
-from siarddk.docindex import DocIndexBuilder
+from siarddk.docindex import DocIndexBuilder, DocIndexReader
+
+
+class TestDocIndexReader(unittest.TestCase):
+    def setUp(self):
+        self.path = os.path.join(tempfile.gettempdir(), 'docIndex.xml')
+        self.builder = DocIndexBuilder()
+        self.builder.add_doc('1', 'docCollection1', '1', 'file1.tif', 'tif')
+
+    def tearDown(self):
+        if os.path.isfile(self.path):
+            os.remove(self.path)
+
+    def test_should_return_mID_1_dCf_1_dID_1(self):
+        self.write_to_file_and_read_docindex()
+        self.assertEqual((1, 1, 1), self.d.get_ids())
+
+    def test_should_return_mID_1_dCf_1_dID_2(self):
+        self.builder.add_doc('1', 'docCollection1', '2', 'file2.tif', 'tif')
+        self.write_to_file_and_read_docindex()
+        self.assertEqual((1, 1, 2), self.d.get_ids())
+
+    def test_should_return_mID_1_dCf_2_dID_3(self):
+        self.builder.add_doc('1', 'docCollection1', '2', 'file2.tif', 'tif')
+        self.builder.add_doc('1', 'docCollection2', '3', 'file3.tif', 'tif')
+        self.write_to_file_and_read_docindex()
+        self.assertEqual((1, 2, 3), self.d.get_ids())
+
+    def test_should_return_mID_2_dCf_3_dID_4(self):
+        self.builder.add_doc('1', 'docCollection1', '2', 'file2.tif', 'tif')
+        self.builder.add_doc('1', 'docCollection2', '3', 'file3.tif', 'tif')
+        self.builder.add_doc('2', 'docCollection3', '4', 'file4.tif', 'tif')
+        self.write_to_file_and_read_docindex()
+        self.assertEqual((2, 3, 4), self.d.get_ids())
+
+    def test_should_raise_exception_if_docindex_invalid(self):
+        self.builder.add_doc('1', 'docCollection1', '2', 'file2.bin', 'bin')
+        with open(self.path, 'w') as f:
+            f.write(str(etree.tostring(self.builder.docIndex), 'utf-8'))
+        with self.assertRaises(etree.DocumentInvalid):
+            DocIndexReader(self.path)
+
+    def write_to_file_and_read_docindex(self):
+        with open(self.path, 'w') as f:
+            f.write(self.builder.to_string())
+        self.d = DocIndexReader(self.path)
 
 
 class TestDocIndexBuilder(unittest.TestCase):
