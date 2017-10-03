@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import unittest
 import mock
+import freezegun
 
 from siarddk.docmanager import LocalDocumentManager
 from tiff.converter import Converter, ComplexConverter
@@ -253,3 +254,7 @@ class TestConverter(unittest.TestCase):
         with open(docIndex, 'r') as docindex:
             content = docindex.read()
         self.assertEqual(expected, content)
+
+    @freezegun.freeze_time('')
+    def test_should_rename_target_folder_if_exists(self):
+        pass
