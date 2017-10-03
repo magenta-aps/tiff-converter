@@ -3,6 +3,13 @@ import os
 import shutil
 
 
+def clean_conversion_folder(folder: os.path.abspath):
+    for f in os.listdir(folder):
+        f = os.path.join(folder, f)
+        if os.path.isfile(f):
+            os.remove(f)
+
+
 def create_conversion_folder(folder: os.path.abspath):
     try:
         shutil.rmtree(folder)

@@ -83,7 +83,6 @@ class Converter(object):
             if success:
                 mID, dCf, dID = self.docmanager.get_location()
 
-            # Create folder
             folder = create_doc_folder(self.target, self.name, mID, dCf, dID)
 
             # Convert file to TIFF
@@ -94,12 +93,7 @@ class Converter(object):
                 self.docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,
                                               str(dID), oFn, 'tif')
 
-            # Clean up conversion folder
-            for f in os.listdir(self.conversion_dir):
-                f = os.path.join(self.conversion_dir, f)
-                if os.path.isfile(f):
-                    os.remove(f)
-
+            clean_conversion_folder(self.conversion_dir)
             next_file = filehandler.get_next_file()
 
         # Write docIndex to file
