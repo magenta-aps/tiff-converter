@@ -1,14 +1,9 @@
-import datetime
-import os
-import shutil
-
 import siarddk.docmanager
 import siarddk.docindex
 import tiff.filehandler
 from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
-from ff.folder import create_doc_folder
-from ff.folder import rename_old_av_folders
+from ff.folder import *
 
 from util.logger import logger
 
@@ -69,22 +64,9 @@ class Converter(object):
         self.docindex_builder = siarddk.docindex.DocIndexBuilder()
         self.complex_converter = ComplexConverter(conversion_dir)
 
-        # Set up target folder
-        if not os.path.isdir(target):
-            os.makedirs(self.target)
-
-        # Rename already existing archival version folders
+        create_target_folder(target)
         rename_old_av_folders(target, name)
-
-
-        # TODO: move folder stuff to ff.folders
-
-        # Set up conversion folder
-        try:
-            shutil.rmtree(self.conversion_dir)
-        except OSError:
-            pass
-        os.makedirs(self.conversion_dir)
+        create_conversion_folder(conversion_dir)
 
         logger.info('Initialized Converter')
 

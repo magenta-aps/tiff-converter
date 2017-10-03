@@ -1,5 +1,14 @@
 import datetime
 import os
+import shutil
+
+
+def create_conversion_folder(folder: os.path.abspath):
+    try:
+        shutil.rmtree(folder)
+    except OSError:
+        pass
+    os.makedirs(folder)
 
 
 def create_doc_folder(target: os.path.abspath, name: str, mID: int, dCf: int,
@@ -11,6 +20,11 @@ def create_doc_folder(target: os.path.abspath, name: str, mID: int, dCf: int,
         os.makedirs(folder)
 
     return folder
+
+
+def create_target_folder(target: os.path.abspath):
+    if not os.path.isdir(target):
+        os.makedirs(target)
 
 
 def rename_old_av_folders(target: os.path.abspath, name: str):
