@@ -75,6 +75,11 @@ class TestComplexConverter(unittest.TestCase):
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
 class TestConverter(unittest.TestCase):
     def setUp(self):
+        self.settings = {
+            'tiff': {
+                'resolution': '150'
+            }
+        }
         self.source = os.path.abspath('test/resources/root')
         self.target = os.path.join(tempfile.gettempdir(), 'tiff-converter')
         if os.path.isdir(self.target):
@@ -82,7 +87,7 @@ class TestConverter(unittest.TestCase):
         self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
         self.converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.MAG.1000',
-                                   LocalDocumentManager())
+                                   LocalDocumentManager(), self.settings)
 
     def tearDown(self):
         if os.path.isdir(self.target):
@@ -141,7 +146,7 @@ class TestConverter(unittest.TestCase):
     def test_should_create_folder_AVID_XYZ_2000_1(self):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.XYZ.2000',
-                              LocalDocumentManager())
+                              LocalDocumentManager(), self.settings)
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(
@@ -217,7 +222,7 @@ class TestConverter(unittest.TestCase):
         self.source = os.path.abspath('test/resources/root2')
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager())
+                              LocalDocumentManager(), self.settings)
         converter.run()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -227,7 +232,7 @@ class TestConverter(unittest.TestCase):
         open(os.path.join(self.conversion_dir, 'file.empty'), 'w').close()
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager())
+                              LocalDocumentManager(), self.settings)
         converter.close()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -254,7 +259,14 @@ class TestConverter(unittest.TestCase):
         with open(docIndex, 'r') as docindex:
             content = docindex.read()
         self.assertEqual(expected, content)
+        
+    def test_should_store_settings(self):
+        self.assertTrue(hasattr(self.converter, 'settings'))
+        self.assertEqual('150', self.converter.settings['tiff']['resolution'])
+        self.converter.close()
 
-    @freezegun.freeze_time('')
+    @unittest.skip('later')
+    @freezegun.freeze_time('2017-01-01 12:00:00')
     def test_should_rename_target_folder_if_exists(self):
-        pass
+        os.mkdir(os.path.join(self.target, 'AVID.MAG.1000.1'))
+        print(self.converter.get_date())

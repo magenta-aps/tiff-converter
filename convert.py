@@ -6,6 +6,7 @@ import click
 
 import tiff.converter
 from siarddk.docmanager import LocalDocumentManager
+from config import settings
 
 
 @click.command()
@@ -31,7 +32,7 @@ def start_conversion(source, target, tempdir, name):
         sys.exit()
 
     converter = tiff.converter.Converter(source, target, tempdir, name,
-                                         LocalDocumentManager())
+                                         LocalDocumentManager(), settings)
     converter.run()
 
 

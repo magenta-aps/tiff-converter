@@ -1,3 +1,4 @@
+import datetime
 import os
 import shutil
 
@@ -53,13 +54,16 @@ class Converter(object):
             target: os.path.abspath,
             conversion_dir: os.path.abspath,
             name: str,
-            docmanager: siarddk.docmanager.DocumentManager
+            docmanager: siarddk.docmanager.DocumentManager,
+            settings: dict
     ):
         self.source = source
         self.target = target
         self.conversion_dir = conversion_dir
         self.name = name
         self.docmanager = docmanager
+        self.settings = settings
+
         self.docindex_builder = siarddk.docindex.DocIndexBuilder()
         self.complex_converter = ComplexConverter(self.conversion_dir)
 
@@ -119,3 +123,6 @@ class Converter(object):
 
         self.close()
         logger.info('Conversion done!')
+
+    def get_date(self):
+        return datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')
