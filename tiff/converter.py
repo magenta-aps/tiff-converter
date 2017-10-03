@@ -7,6 +7,7 @@ import siarddk.docindex
 import tiff.filehandler
 from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
+from ff.folder import create_doc_folder
 
 from util.logger import logger
 
@@ -90,11 +91,7 @@ class Converter(object):
                 mID, dCf, dID = self.docmanager.get_location()
 
             # Create folder
-            folder = os.path.join(self.target, '%s.%s' % (self.name, mID),
-                                  'Documents', 'docCollection%s' % dCf, str(dID)
-                                  )
-            if not os.path.isdir(folder):
-                os.makedirs(folder)
+            folder = create_doc_folder(self.target, self.name, mID, dCf, dID)
 
             # Convert file to TIFF
             success = self.complex_converter.convert(
@@ -123,6 +120,3 @@ class Converter(object):
 
         self.close()
         logger.info('Conversion done!')
-
-    def get_date(self):
-        return datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')
