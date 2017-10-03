@@ -2,8 +2,9 @@ import os
 import shutil
 import tempfile
 import unittest
+import freezegun
 
-from ff.folder import create_doc_folder
+from ff.folder import create_doc_folder, rename_old_av_folders
 
 
 class TestFolder(unittest.TestCase):
@@ -32,3 +33,31 @@ class TestFolder(unittest.TestCase):
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.3', 'Documents',
                          'docCollection2', '5'), folder)
+
+    @freezegun.freeze_time('2017-01-01 12:00:00')
+    def test_should_rename_AVID_MAG_1000_1(self):
+        os.makedirs(os.path.join(self.target, 'AVID.MAG.1000.1'))
+        rename_old_av_folders(self.target, 'AVID.MAG.1000')
+        self.assertTrue(os.path.isdir(
+            os.path.join(self.target, 'AVID.MAG.1000.1_2017-01-01_120000')))
+
+    @freezegun.freeze_time('2017-01-01 12:00:00')
+    def test_should_rename_AVID_MAG_2000_2(self):
+        os.makedirs(os.path.join(self.target, 'AVID.MAG.2000.2'))
+        rename_old_av_folders(self.target, 'AVID.MAG.2000')
+        self.assertTrue(os.path.isdir(
+            os.path.join(self.target, 'AVID.MAG.2000.2_2017-01-01_120000')))
+
+    @freezegun.freeze_time('2017-01-01 12:00:00')
+    def test_should_rename_AVID_MAG_1000_1_and_AVID_MAG_1000_3(self):
+        os.makedirs(os.path.join(self.target, 'AVID.MAG.1000.1'))
+        os.makedirs(os.path.join(self.target, 'AVID.MAG.1000.3'))
+        rename_old_av_folders(self.target, 'AVID.MAG.1000')
+        self.assertTrue(os.path.isdir(
+            os.path.join(self.target, 'AVID.MAG.1000.1_2017-01-01_120000')))
+        self.assertTrue(os.path.isdir(
+            os.path.join(self.target, 'AVID.MAG.1000.3_2017-01-01_120000')))
+        self.assertFalse(
+            os.path.isdir(os.path.join(self.target, 'AVID.MAG.1000.1')))
+        self.assertFalse(os.path.isdir(
+            os.path.join(self.target, 'AVID.MAG.1000.1')))
