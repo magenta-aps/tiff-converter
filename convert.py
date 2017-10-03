@@ -14,13 +14,18 @@ from config import settings
               help='Absolute path to root dir of files to convert')
 @click.option('--target', type=click.Path(writable=True),
               help='Absolute path to target folder')
+@click.option('--name',
+              help='The name of the archival version e.g. AVID.MAG.1000')
 @click.option('--tempdir',
               type=click.Path(exists=True, writable=True),
               default=os.path.join(tempfile.gettempdir(), 'tiff-conversion'),
               help='The temporary folder to use for tiff conversion')
-@click.option('--name',
-              help='The name of the archival version e.g. AVID.MAG.1000')
-def start_conversion(source, target, tempdir, name):
+@click.option('--append', is_flag=True, default=False,
+              help='Use this option if you want to append data to an '
+                   'already existing archival version')
+def start_conversion(source, target, tempdir, name, append):
+
+    settings['append'] = append
 
     regex_str = 'AVID\.[a-zA-Z]{2,4}\.[1-9][0-9]*'
     regex = re.compile(regex_str)
