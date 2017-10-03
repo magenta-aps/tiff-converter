@@ -27,49 +27,57 @@ class TestComplexConverter(unittest.TestCase):
         source = os.path.abspath('test/resources/root3/spreadsheet1.xlsx')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
     def test_should_convert_pdf_correctly(self):
         source = os.path.abspath('test/resources/sample.pdf')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
     def test_should_convert_PDF_correctly(self):
         source = os.path.abspath('test/resources/sample.PDF')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
     def test_should_convert_doc_correctly(self):
         source = os.path.abspath('test/resources/sample.doc')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
     def test_should_convert_xls_correctly(self):
         source = os.path.abspath('test/resources/sample.xls')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
     def test_should_convert_pptx_correctly(self):
         source = os.path.abspath('test/resources/sample.pptx')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
     def test_should_convert_ppt_correctly(self):
         source = os.path.abspath('test/resources/sample.ppt')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
     def test_should_convert_jpg_correctly(self):
         source = os.path.abspath('test/resources/sample.jpg')
         self.assertTrue(
             self.converter.convert(source,
-                              os.path.join(self.conversion_dir, 'temp.tif')))
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
 
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
@@ -259,14 +267,26 @@ class TestConverter(unittest.TestCase):
         with open(docIndex, 'r') as docindex:
             content = docindex.read()
         self.assertEqual(expected, content)
-        
+
     def test_should_store_settings(self):
         self.assertTrue(hasattr(self.converter, 'settings'))
         self.assertEqual('150', self.converter.settings['tiff']['resolution'])
         self.converter.close()
 
-    @unittest.skip('later')
+    def test_should_create_target_folder_in_constructor(self):
+        self.assertTrue(os.path.isdir(self.target))
+        self.converter.close()
+
     @freezegun.freeze_time('2017-01-01 12:00:00')
     def test_should_rename_target_folder_if_exists(self):
-        os.mkdir(os.path.join(self.target, 'AVID.MAG.1000.1'))
-        print(self.converter.get_date())
+        path_to_rename = os.path.join(self.target, 'AVID.MAG.1000.1')
+        os.makedirs(path_to_rename)
+        self.source = os.path.abspath('test/resources/root2')
+        converter = Converter(self.source, self.target,
+                              self.conversion_dir, 'AVID.MAG.1000',
+                              LocalDocumentManager(), self.settings)
+        converter.close()
+        self.converter.close()
+        self.assertFalse(os.path.isdir(path_to_rename))
+        self.assertTrue(os.path.isdir(
+            os.path.join(self.target, 'AVID.MAG.1000.1_2017-01-01_120000')))

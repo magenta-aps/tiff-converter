@@ -8,6 +8,7 @@ import tiff.filehandler
 from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
 from ff.folder import create_doc_folder
+from ff.folder import rename_old_av_folders
 
 from util.logger import logger
 
@@ -66,7 +67,17 @@ class Converter(object):
         self.settings = settings
 
         self.docindex_builder = siarddk.docindex.DocIndexBuilder()
-        self.complex_converter = ComplexConverter(self.conversion_dir)
+        self.complex_converter = ComplexConverter(conversion_dir)
+
+        # Set up target folder
+        if not os.path.isdir(target):
+            os.makedirs(self.target)
+
+        # Rename already existing archival version folders
+        rename_old_av_folders(target, name)
+
+
+        # TODO: move folder stuff to ff.folders
 
         # Set up conversion folder
         try:
