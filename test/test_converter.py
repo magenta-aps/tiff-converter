@@ -86,7 +86,8 @@ class TestConverter(unittest.TestCase):
         self.settings = {
             'tiff': {
                 'resolution': '150'
-            }
+            },
+            'append': False
         }
         self.source = os.path.abspath('test/resources/root')
         self.target = os.path.join(tempfile.gettempdir(), 'tiff-converter')
@@ -290,3 +291,25 @@ class TestConverter(unittest.TestCase):
         self.assertFalse(os.path.isdir(path_to_rename))
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1_2017-01-01_120000')))
+
+    @unittest.skip('later')
+    def test_should_append_new_files_to_an_existing_av(self):
+        pass
+        # self.converter.run()
+
+        # self.assertTrue(os.path.isfile(
+        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+        #                  'docCollection1', '1', '1.tif')))
+        # self.assertTrue(os.path.isfile(
+        #     os.path.join(self.target,
+        #                  'AVID.MAG.1000.1', 'Documents', 'docCollection1',
+        #                  '2', '2.tif')))
+        # self.assertTrue(os.path.isfile(
+        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+        #                  'docCollection1', '3', '3.tif')))
+        # self.assertTrue(os.path.isfile(
+        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+        #                  'docCollection1', '4', '4.tif')))
+        # self.assertFalse(os.path.isfile(
+        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+        #                  'docCollection1', '5', '5.tif')))
