@@ -69,7 +69,11 @@ class DocIndexReader(object):
             xsd = etree.XMLSchema(etree.parse(f))
             xsd.assertValid(self.docindex)
 
+    def get_docindex(self):
+        return self.docindex
+
     def get_ids(self):
         doc = self.docindex[-1]
         return int(doc[1].text), int(
             doc[2].text.split('docCollection')[1]), int(doc[0].text)
+

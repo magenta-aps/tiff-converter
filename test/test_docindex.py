@@ -46,6 +46,17 @@ class TestDocIndexReader(unittest.TestCase):
         with self.assertRaises(etree.DocumentInvalid):
             DocIndexReader(self.path)
 
+    def test_should_return_docindex(self):
+        self.write_to_file_and_read_docindex()
+        docindex = self.d.get_docindex()
+        self.assertEqual(1, len(docindex))
+        doc1 = docindex[0]
+        self.assertEqual('1', doc1[0].text)
+        self.assertEqual('1', doc1[1].text)
+        self.assertEqual('docCollection1', doc1[2].text)
+        self.assertEqual('file1.tif', doc1[3].text)
+        self.assertEqual('tif', doc1[4].text)
+
     def write_to_file_and_read_docindex(self):
         with open(self.path, 'w') as f:
             f.write(self.builder.to_string())
