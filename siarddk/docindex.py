@@ -12,12 +12,16 @@ class DocIndexBuilder(object):
         'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
     }
 
-    def __init__(self):
-        tag = etree.QName(self.NS, 'docIndex')
-        self.docIndex = etree.Element(tag, nsmap=self.NSMAP)
-        schema_location = etree.QName(self.NSMAP['xsi'], 'schemaLocation')
-        self.docIndex.set(schema_location, 'http://www.sa.dk/xmlns/diark/1.0 '
-                                           '../Schemas/standard/docIndex.xsd')
+    def __init__(self, docindex=None):
+        if docindex is not None:
+            self.docIndex = docindex
+        else:
+            tag = etree.QName(self.NS, 'docIndex')
+            self.docIndex = etree.Element(tag, nsmap=self.NSMAP)
+            schema_location = etree.QName(self.NSMAP['xsi'], 'schemaLocation')
+            self.docIndex.set(schema_location,
+                              'http://www.sa.dk/xmlns/diark/1.0 '
+                              '../Schemas/standard/docIndex.xsd')
         logger.info('Initialized docIndex builder')
 
     def add_doc(self, mID: str, dCf: str, dID: str, oFn: str, aFt: str):
@@ -35,7 +39,7 @@ class DocIndexBuilder(object):
 
         logger.debug('Added document to docIndex XML')
 
-    def build(self):
+    def build(self) -> etree.Element:
         logger.info('Validating docIndex.xml...')
         with open('siarddk/docIndex.xsd', 'r') as f:
             xsd = etree.XMLSchema(etree.parse(f))

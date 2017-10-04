@@ -76,6 +76,31 @@ class TestDocIndexBuilder(unittest.TestCase):
             'http://www.sa.dk/xmlns/diark/1.0 ../Schemas/standard/docIndex.xsd',
             self.builder.build().get('{%s}' % name_space + 'schemaLocation'))
 
+    def test_should_store_existing_docindex(self):
+        docindex_old = self.builder.build()
+        builder_new = DocIndexBuilder(docindex_old)
+        docindex_new = builder_new.build()
+        self.assertEqual(2, len(docindex_new))
+
+    def test_should_append_document_to_existing_docindex(self):
+        docindex_old = self.builder.build()
+        builder_new = DocIndexBuilder(docindex_old)
+        builder_new.add_doc('3', 'docCollection3', '3', 'name3.tif', 'tif')
+        docindex_new = builder_new.build()
+        self.assertEqual(3, len(docindex_new))
+        doc1 = docindex_new[0]
+        self.assertEqual('1', doc1[0].text)
+        self.assertEqual('1', doc1[1].text)
+        self.assertEqual('docCollection1', doc1[2].text)
+        self.assertEqual('name.tif', doc1[3].text)
+        self.assertEqual('tif', doc1[4].text)
+        doc3 = docindex_new[2]
+        self.assertEqual('3', doc3[0].text)
+        self.assertEqual('3', doc3[1].text)
+        self.assertEqual('docCollection3', doc3[2].text)
+        self.assertEqual('name3.tif', doc3[3].text)
+        self.assertEqual('tif', doc3[4].text)
+
     # Testing add_doc
 
     def test_docIndex_should_have_child_doc(self):
