@@ -294,6 +294,7 @@ class TestConverter(unittest.TestCase):
             os.path.join(self.target, 'AVID.MAG.1000.1_2017-01-01_120000')))
 
 
+@unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
 class TestConverterAppend(unittest.TestCase):
     def test_should_append_new_file_to_an_existing_av(self):
         settings = {
@@ -318,7 +319,7 @@ class TestConverterAppend(unittest.TestCase):
         docindex_reader = DocIndexReader(
             os.path.join(target, 'AVID.MAG.1000.1', 'Indices', 'docIndex.xml'))
         mID, dCf, dID = docindex_reader.get_ids()
-        docindex = docindex_reader.get_docindex()
+        docindex = docindex_reader.get_index()
 
         converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
                               LocalDocumentManager(mID, dCf, dID), settings,

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fileIndex xsi:schemaLocation="http://www.sa.dk/xmlns/diark/1.0 ../Schemas/standard/fileIndex.xsd" xmlns="http://www.sa.dk/xmlns/diark/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <f>
+    <foN>AVID.MAG.1000.1\Indices</foN>
+    <fiN>archiveIndex.xml</fiN>
+    <md5>16EFBE43D5F278162428A625FF0CA18C</md5>
+  </f>
+  <f>
+    <foN>AVID.MAG.1000.1\Indices</foN>
+    <fiN>contextDocumentationIndex.xml</fiN>
+    <md5>404F3DB2D3D0B8C988E934D63A84AF57</md5>
+  </f>
+  <f>
+    <foN>AVID.MAG.1000.1\Indices</foN>
+    <fiN>tableIndex.xml</fiN>
+    <md5>27BA58C01AD8EBEA5234249AB74BAD21</md5>
+  </f>
+</fileIndex>

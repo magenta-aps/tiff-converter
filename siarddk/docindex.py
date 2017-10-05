@@ -1,6 +1,7 @@
 import os
 from lxml import etree
 
+from siarddk.xml import IndexReader
 from util.logger import logger
 
 
@@ -61,19 +62,12 @@ class DocIndexBuilder(object):
         element.text = value
 
 
-class DocIndexReader(object):
+class DocIndexReader(IndexReader):
     def __init__(self, path: os.path.abspath):
-        with open(path, 'r') as f:
-            self.docindex = etree.parse(f).getroot()
-        with open('siarddk/docIndex.xsd', 'r') as f:
-            xsd = etree.XMLSchema(etree.parse(f))
-            xsd.assertValid(self.docindex)
-
-    def get_docindex(self):
-        return self.docindex
+        super().__init__(path)
 
     def get_ids(self):
-        doc = self.docindex[-1]
+        doc = self.index[-1]
         return int(doc[1].text), int(
             doc[2].text.split('docCollection')[1]), int(doc[0].text)
 

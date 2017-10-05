@@ -48,7 +48,7 @@ class TestDocIndexReader(unittest.TestCase):
 
     def test_should_return_docindex(self):
         self.write_to_file_and_read_docindex()
-        docindex = self.d.get_docindex()
+        docindex = self.d.get_index()
         self.assertEqual(1, len(docindex))
         doc1 = docindex[0]
         self.assertEqual('1', doc1[0].text)

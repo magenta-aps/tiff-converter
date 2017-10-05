@@ -27,7 +27,7 @@ from config import settings
 def start_conversion(source, target, tempdir, name, append):
     settings['append'] = append
 
-    regex_str = 'AVID\.[a-zA-Z]{2,4}\.[1-9][0-9]*'
+    regex_str = 'AVID\.[A-ZÆØÅ]{2,4}\.[1-9][0-9]*'
     regex = re.compile(regex_str)
     name_ok = regex.match(name)
     if not name_ok:
@@ -40,7 +40,7 @@ def start_conversion(source, target, tempdir, name, append):
         docindex_reader = DocIndexReader(
             os.path.join(target, '%s.1' % name, 'Indices', 'docIndex.xml'))
         mID, dCf, dID = docindex_reader.get_ids()
-        docindex = docindex_reader.get_docindex()
+        docindex = docindex_reader.get_index()
     else:
         mID, dCf, dID = (1, 1, 1)
         docindex = None
