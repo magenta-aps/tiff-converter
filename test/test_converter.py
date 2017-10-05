@@ -8,6 +8,7 @@ import freezegun
 
 from siarddk.docmanager import LocalDocumentManager
 from tiff.converter import Converter, ComplexConverter
+from siarddk.docindex import DocIndexReader
 
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
@@ -90,7 +91,7 @@ class TestConverter(unittest.TestCase):
             'append': False
         }
         self.source = os.path.abspath('test/resources/root')
-        self.target = os.path.join(tempfile.gettempdir(), 'tiff-converter')
+        self.target = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
         if os.path.isdir(self.target):
             shutil.rmtree(self.target)
         self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
@@ -292,24 +293,76 @@ class TestConverter(unittest.TestCase):
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1_2017-01-01_120000')))
 
-    @unittest.skip('later')
-    def test_should_append_new_files_to_an_existing_av(self):
-        pass
-        # self.converter.run()
 
-        # self.assertTrue(os.path.isfile(
-        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-        #                  'docCollection1', '1', '1.tif')))
-        # self.assertTrue(os.path.isfile(
-        #     os.path.join(self.target,
-        #                  'AVID.MAG.1000.1', 'Documents', 'docCollection1',
-        #                  '2', '2.tif')))
-        # self.assertTrue(os.path.isfile(
-        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-        #                  'docCollection1', '3', '3.tif')))
-        # self.assertTrue(os.path.isfile(
-        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-        #                  'docCollection1', '4', '4.tif')))
-        # self.assertFalse(os.path.isfile(
-        #     os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-        #                  'docCollection1', '5', '5.tif')))
+class TestConverterAppend(unittest.TestCase):
+    def test_should_append_new_file_to_an_existing_av(self):
+        settings = {
+            'tiff': {
+                'resolution': '150'
+            },
+            'append': False
+        }
+        source = os.path.abspath('test/resources/root')
+        target = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
+        if os.path.isdir(target):
+            shutil.rmtree(target)
+        conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
+        converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
+                              LocalDocumentManager(), settings)
+        converter.run()
+
+        # Add new file to the existing AV
+
+        settings['append'] = True
+        source = os.path.abspath('test/resources/root3')
+        docindex_reader = DocIndexReader(
+            os.path.join(target, 'AVID.MAG.1000.1', 'Indices', 'docIndex.xml'))
+        mID, dCf, dID = docindex_reader.get_ids()
+        docindex = docindex_reader.get_docindex()
+
+        converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
+                              LocalDocumentManager(mID, dCf, dID), settings,
+                              docindex)
+        converter.run()
+
+        # Check that the tiffs exist
+
+        self.assertTrue(os.path.isfile(
+            os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(target,
+                         'AVID.MAG.1000.1', 'Documents', 'docCollection1',
+                         '2', '2.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '3', '3.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '4', '4.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '5', '5.tif')))
+
+        # Check docIndex.xml
+
+        self.assertEqual(5, len(docindex))
+        for i in range(1, 5):
+            doc = docindex[i - 1]
+            self.assertEqual(str(i), doc[0].text)
+            self.assertEqual('1', doc[1].text)
+            self.assertEqual('docCollection1', doc[2].text)
+            self.assertEqual('sample%s.docx' % (1 if i % 2 == 1 else 2),
+                             doc[3].text)
+            self.assertEqual('tif', doc[4].text)
+        doc = docindex[4]
+        self.assertEqual('5', doc[0].text)
+        self.assertEqual('1', doc[1].text)
+        self.assertEqual('docCollection1', doc[2].text)
+        self.assertEqual('spreadsheet1.xlsx', doc[3].text)
+        self.assertEqual('tif', doc[4].text)
+
+        if os.path.isdir(target):
+            shutil.rmtree(target)
+        if os.path.isdir(conversion_dir):
+            shutil.rmtree(conversion_dir)

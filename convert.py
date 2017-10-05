@@ -6,6 +6,7 @@ import click
 
 import tiff.converter
 from siarddk.docmanager import LocalDocumentManager
+from siarddk.docindex import DocIndexReader
 from config import settings
 
 
@@ -24,7 +25,6 @@ from config import settings
               help='Use this option if you want to append data to an '
                    'already existing archival version')
 def start_conversion(source, target, tempdir, name, append):
-
     settings['append'] = append
 
     regex_str = 'AVID\.[a-zA-Z]{2,4}\.[1-9][0-9]*'
@@ -36,8 +36,19 @@ def start_conversion(source, target, tempdir, name, append):
             'the regular expression %s' % regex_str)
         sys.exit()
 
-    converter = tiff.converter.Converter(source, target, tempdir, name,
-                                         LocalDocumentManager(), settings)
+    if append:
+        docindex_reader = DocIndexReader(
+            os.path.join(target, '%s.1' % name, 'Indices', 'docIndex.xml'))
+        mID, dCf, dID = docindex_reader.get_ids()
+        docindex = docindex_reader.get_docindex()
+    else:
+        mID, dCf, dID = (1, 1, 1)
+        docindex = None
+
+    converter = tiff.converter.Converter(
+        source, target, tempdir, name, LocalDocumentManager(mID, dCf, dID),
+        settings, docindex)
+
     converter.run()
 
 

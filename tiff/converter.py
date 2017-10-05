@@ -52,7 +52,8 @@ class Converter(object):
             conversion_dir: os.path.abspath,
             name: str,
             docmanager: siarddk.docmanager.DocumentManager,
-            settings: dict
+            settings: dict,
+            old_docindex=None
     ):
         self.source = source
         self.target = target
@@ -61,12 +62,14 @@ class Converter(object):
         self.docmanager = docmanager
         self.settings = settings
 
-        self.docindex_builder = siarddk.docindex.DocIndexBuilder()
+        self.docindex_builder = siarddk.docindex.DocIndexBuilder(old_docindex)
         self.complex_converter = ComplexConverter(conversion_dir)
 
         create_target_folder(target)
-        rename_old_av_folders(target, name)
+        if not settings['append']:
+            rename_old_av_folders(target, name)
         create_conversion_folder(conversion_dir)
+        clean_conversion_folder(conversion_dir)
 
         logger.info('Initialized Converter')
 
@@ -96,10 +99,12 @@ class Converter(object):
             clean_conversion_folder(self.conversion_dir)
             next_file = filehandler.get_next_file()
 
+        # TODO: move this elsewhere... (responsibility erosion)
         # Write docIndex to file
         logger.info('Writing docIndex.xml to disk...')
         indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
-        os.mkdir(indices_path)
+        if not self.settings['append']:
+            os.mkdir(indices_path)
         docindex_path = os.path.join(indices_path, 'docIndex.xml')
         with open(docindex_path, 'w') as docindex:
             docindex.write(self.docindex_builder.to_string())
