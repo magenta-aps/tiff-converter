@@ -1,15 +1,13 @@
 import os
 from lxml import etree
 
-from siarddk.xml import IndexReader
+from siarddk.xml import *
 from util.logger import logger
 
 
-class DocIndexBuilder(object):
-    NS = 'http://www.sa.dk/xmlns/diark/1.0'
-
+class DocIndexBuilder(SIARDDK):
     NSMAP = {
-        None: NS,
+        None: SIARDDK.NS,
         'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
     }
 
@@ -32,11 +30,11 @@ class DocIndexBuilder(object):
         doc_element = etree.SubElement(self.docIndex, tag)
 
         # TODO: pID and gmlXsd still missing
-        self._add_doc_child(doc_element, 'dID', dID)
-        self._add_doc_child(doc_element, 'mID', mID)
-        self._add_doc_child(doc_element, 'dCf', dCf)
-        self._add_doc_child(doc_element, 'oFn', oFn)
-        self._add_doc_child(doc_element, 'aFt', aFt)
+        self.add_element_child(doc_element, 'dID', dID)
+        self.add_element_child(doc_element, 'mID', mID)
+        self.add_element_child(doc_element, 'dCf', dCf)
+        self.add_element_child(doc_element, 'oFn', oFn)
+        self.add_element_child(doc_element, 'aFt', aFt)
 
         logger.debug('Added document to docIndex XML')
 
@@ -55,11 +53,6 @@ class DocIndexBuilder(object):
 
     def to_string(self):
         return str(etree.tostring(self.build()), 'utf-8')
-
-    def _add_doc_child(self, doc_element: etree.Element, name: str, value: str):
-        tag = etree.QName(self.NS, name)
-        element = etree.SubElement(doc_element, tag)
-        element.text = value
 
 
 class DocIndexReader(IndexReader):

@@ -3,6 +3,15 @@ import os
 from lxml import etree
 
 
+class SIARDDK(object):
+    NS = 'http://www.sa.dk/xmlns/diark/1.0'
+
+    def add_element_child(self, element: etree.Element, name: str, value: str):
+        tag = etree.QName(self.NS, name)
+        element = etree.SubElement(element, tag)
+        element.text = value
+
+
 class IndexReader(object):
     def __init__(self, path: os.path.abspath):
         with open(path, 'r') as f:
