@@ -48,7 +48,6 @@ class DocIndexBuilder(SIARDDK):
             else:
                 logger.error(
                     'docIndex.xml NOT valid! Error: %s' % xsd.error_log)
-        # print(str(etree.tostring(self.docIndex, pretty_print=True), 'utf-8'))
         return self.docIndex
 
     def to_string(self):

@@ -29,6 +29,18 @@ class FileIndex(SIARDDK, IndexReader):
 
         # log stuff
 
+    def calculate_md5sums(self):
+        pass
+
+    def remove_all(self):
+        """
+        Remove all files except for those in the Tables folder
+        """
+        for f in self.get_index():
+            foN = f[0].text
+            if not foN.split('\\')[1] == 'Tables':
+                f.getparent().remove(f)
+
     @staticmethod
     def _get_md5sum(path: os.path.abspath) -> str:
         hash_md5 = hashlib.md5()

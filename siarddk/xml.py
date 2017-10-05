@@ -3,6 +3,11 @@ import os
 from lxml import etree
 
 
+def print_element(element):
+    print(str(etree.tostring(element, pretty_print=True), 'utf-8'))
+
+
+# TODO: rename this class to e.g. XmlBuildHelper...
 class SIARDDK(object):
     NS = 'http://www.sa.dk/xmlns/diark/1.0'
 

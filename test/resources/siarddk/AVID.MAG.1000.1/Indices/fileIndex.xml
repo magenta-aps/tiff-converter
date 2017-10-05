@@ -15,4 +15,24 @@
     <fiN>tableIndex.xml</fiN>
     <md5>27BA58C01AD8EBEA5234249AB74BAD21</md5>
   </f>
+  <f>
+    <foN>AVID.MAG.1000.1\Tables\table1</foN>
+    <fiN>table1.xml</fiN>
+    <md5>D41D8CD98F00B204E9800998ECF8427E</md5>
+  </f>
+  <f>
+    <foN>AVID.MAG.1000.1\Tables\table1</foN>
+    <fiN>table1.xsd</fiN>
+    <md5>D41D8CD98F00B204E9800998ECF8427E</md5>
+  </f>
+  <f>
+    <foN>AVID.MAG.1000.1\Tables\table2</foN>
+    <fiN>table2.xml</fiN>
+    <md5>D41D8CD98F00B204E9800998ECF8427E</md5>
+  </f>
+  <f>
+    <foN>AVID.MAG.1000.1\Tables\table2</foN>
+    <fiN>table2.xsd</fiN>
+    <md5>D41D8CD98F00B204E9800998ECF8427E</md5>
+  </f>
 </fileIndex>
