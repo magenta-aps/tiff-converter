@@ -42,7 +42,7 @@ class TestDocIndexReader(unittest.TestCase):
     def test_should_raise_exception_if_docindex_invalid(self):
         self.builder.add_doc('1', 'docCollection1', '2', 'file2.bin', 'bin')
         with open(self.path, 'w') as f:
-            f.write(str(etree.tostring(self.builder.docIndex), 'utf-8'))
+            f.write(str(etree.tostring(self.builder.index), 'utf-8'))
         with self.assertRaises(etree.DocumentInvalid):
             DocIndexReader(self.path)
 
@@ -71,6 +71,9 @@ class TestDocIndexBuilder(unittest.TestCase):
         self.doc1 = self.builder.build()[0]
         self.builder.add_doc('2', 'docCollection2', '2', 'name2.jpg', 'wav')
         self.doc2 = self.builder.build()[1]
+
+    def test_should_store_type_docindex(self):
+        self.assertEqual('docIndex', self.builder.NAME)
 
     # Testing that the docIndex element is constructed correctly
 

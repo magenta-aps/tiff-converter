@@ -80,5 +80,8 @@ class TestFileIndexReader(unittest.TestCase):
         self.assertEqual('6e95958e99aea72260f8036276d35ad9'.upper(),
                          doc1[2].text)
 
-        # should add root documents to fileIndex correctly
-        # new fileIndex.xml should be valid
+    def test_should_store_type_fileindex(self):
+        self.assertEqual('fileIndex', self.fileindex.NAME)
+
+    # def test_fileindex_xml_should_be_valid(self):
+    #     pass

@@ -8,13 +8,16 @@ from tiff.filehandler import LocalFileHandler
 
 class FileIndex(IndexBuilder, IndexReader):
     NS = 'http://www.sa.dk/xmlns/diark/1.0'
+    NAME = 'fileIndex'
 
     def __init__(self, target: os.path.abspath, path: os.path.abspath):
         """
         :param target: the target folder where the archival version is located
         :param path: the full path to fileIndex.xml
         """
-        super().__init__(path)
+        # TODO: this is getting ugly... use compositional design instead
+        IndexBuilder.__init__(self)
+        IndexReader.__init__(self, path)
         self.target = target
 
     def add_file(self, path: os.path.abspath):
