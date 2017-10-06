@@ -40,9 +40,6 @@ class DocIndexBuilder(IndexBuilder):
 
         logger.debug('Added document to docIndex XML')
 
-    def to_string(self):
-        return str(etree.tostring(self.build()), 'utf-8')
-
 
 class DocIndexReader(IndexReader):
     def __init__(self, path: os.path.abspath):

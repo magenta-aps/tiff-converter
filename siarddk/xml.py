@@ -36,7 +36,10 @@ class IndexBuilder(object):
                     '%s.xml NOT valid! Error: %s' % (self.NAME, xsd.error_log))
         return self.index
 
-    # def write(self, target: os.path.abspath):
+    def to_string(self):
+        return str(etree.tostring(self.build()), 'utf-8')
+
+            # def write(self, target: os.path.abspath):
     #     """
     #     Validate the index file and write it to disk
     #     :return: None
