@@ -3,6 +3,7 @@ import hashlib
 from lxml import etree
 
 from siarddk.xml import *
+from tiff.filehandler import LocalFileHandler
 
 
 class FileIndex(SIARDDK, IndexReader):
@@ -16,21 +17,31 @@ class FileIndex(SIARDDK, IndexReader):
         super().__init__(path)
         self.target = target
 
-    def add(self, path: os.path.abspath):
-        tag = etree.QName(self.NS, 'f')
-        f = etree.SubElement(self.get_index(), tag)
-
+    def add_file(self, path: os.path.abspath):
         foN, fiN = os.path.split(path)
         foN = os.path.relpath(foN, self.target).replace('/', '\\')
 
-        self.add_element_child(f, 'foN', foN)
-        self.add_element_child(f, 'fiN', fiN)
-        self.add_element_child(f, 'md5', self._get_md5sum(path))
+        exclude_conditions = [
+            foN.split('\\')[1] == 'Indices' and fiN == 'fileIndex.xml',
+            foN.split('\\')[1] == 'Tables'
+        ]
+
+        if True not in exclude_conditions:
+            tag = etree.QName(self.NS, 'f')
+            f = etree.SubElement(self.get_index(), tag)
+            self.add_element_child(f, 'foN', foN)
+            self.add_element_child(f, 'fiN', fiN)
+            self.add_element_child(f, 'md5', self._get_md5sum(path))
 
         # log stuff
 
-    def calculate_md5sums(self):
-        pass
+    def add_folders(self, folders: list):
+        for folder in folders:
+            filehandler = LocalFileHandler(folder)
+            next_file = filehandler.get_next_file()
+            while next_file:
+                self.add_file(next_file)
+                next_file = filehandler.get_next_file()
 
     def remove_all(self):
         """
