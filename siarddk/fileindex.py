@@ -6,7 +6,7 @@ from siarddk.xml import *
 from tiff.filehandler import LocalFileHandler
 
 
-class FileIndex(SIARDDK, IndexReader):
+class FileIndex(IndexBuilder, IndexReader):
     NS = 'http://www.sa.dk/xmlns/diark/1.0'
 
     def __init__(self, target: os.path.abspath, path: os.path.abspath):

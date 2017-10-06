@@ -7,8 +7,7 @@ def print_element(element):
     print(str(etree.tostring(element, pretty_print=True), 'utf-8'))
 
 
-# TODO: rename this class to e.g. XmlBuildHelper...
-class SIARDDK(object):
+class IndexBuilder(object):
     NS = 'http://www.sa.dk/xmlns/diark/1.0'
 
     def add_element_child(self, element: etree.Element, name: str, value: str):

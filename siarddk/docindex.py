@@ -5,9 +5,9 @@ from siarddk.xml import *
 from util.logger import logger
 
 
-class DocIndexBuilder(SIARDDK):
+class DocIndexBuilder(IndexBuilder):
     NSMAP = {
-        None: SIARDDK.NS,
+        None: IndexBuilder.NS,
         'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
     }
 
