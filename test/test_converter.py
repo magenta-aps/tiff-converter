@@ -191,6 +191,9 @@ class TestConverter(unittest.TestCase):
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '4', '1.tif')))
+        self.assertFalse(os.path.isdir(
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '5')))
         self.assertFalse(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '5', '1.tif')))

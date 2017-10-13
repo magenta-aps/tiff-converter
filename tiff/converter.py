@@ -106,6 +106,8 @@ class Converter(object):
                 oFn = os.path.basename(next_file)
                 self.docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,
                                               str(dID), oFn, 'tif')
+            else:
+                os.rmdir(folder)
 
             clean_conversion_folder(self.conversion_dir)
             next_file = filehandler.get_next_file()
