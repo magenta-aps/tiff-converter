@@ -36,6 +36,8 @@ def start_conversion(source, target, tempdir, name, append):
             'the regular expression %s' % regex_str)
         sys.exit()
 
+    # TODO: move this into the Converter itself
+
     if append:
         docindex_reader = DocIndexReader(
             os.path.join(target, '%s.1' % name, 'Indices', 'docIndex.xml'))

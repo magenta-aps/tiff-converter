@@ -90,7 +90,7 @@ class Converter(object):
 
             # Convert file to TIFF
             success = self.complex_converter.convert(
-                next_file, os.path.join(folder, '%s.tif' % dID))
+                next_file, os.path.join(folder, '1.tif'))
             if success:
                 oFn = os.path.basename(next_file)
                 self.docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,

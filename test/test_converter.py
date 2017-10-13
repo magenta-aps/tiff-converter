@@ -170,16 +170,16 @@ class TestConverter(unittest.TestCase):
         self.assertTrue(os.path.isfile(
             os.path.join(self.target,
                          'AVID.MAG.1000.1', 'Documents', 'docCollection1',
-                         '2', '2.tif')))
+                         '2', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '3', '3.tif')))
+                         'docCollection1', '3', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '4', '4.tif')))
+                         'docCollection1', '4', '1.tif')))
         self.assertFalse(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '5', '5.tif')))
+                         'docCollection1', '5', '1.tif')))
 
     def test_should_convert_root_folder_correctly_when_MAX_2(self):
         self.converter.docmanager.MAX = 2
@@ -190,19 +190,19 @@ class TestConverter(unittest.TestCase):
         self.assertTrue(os.path.isfile(
             os.path.join(self.target,
                          'AVID.MAG.1000.1', 'Documents', 'docCollection1',
-                         '2', '2.tif')))
+                         '2', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection2', '3', '3.tif')))
+                         'docCollection2', '3', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection2', '4', '4.tif')))
+                         'docCollection2', '4', '1.tif')))
         self.assertFalse(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection3', '5', '5.tif')))
+                         'docCollection3', '5', '1.tif')))
         self.assertFalse(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection3', '5', '5.tif')))
+                         'docCollection3', '5', '1.tif')))
 
     @mock.patch('tiff.tiffconverter.TiffConverter.pdf_convert')
     def test_pdf_conversion_succeeds_tiff_conversion_fails(self, mock_convert):
@@ -334,16 +334,16 @@ class TestConverterAppend(unittest.TestCase):
         self.assertTrue(os.path.isfile(
             os.path.join(target,
                          'AVID.MAG.1000.1', 'Documents', 'docCollection1',
-                         '2', '2.tif')))
+                         '2', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '3', '3.tif')))
+                         'docCollection1', '3', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '4', '4.tif')))
+                         'docCollection1', '4', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '5', '5.tif')))
+                         'docCollection1', '5', '1.tif')))
 
         # Check docIndex.xml
 
