@@ -5,7 +5,7 @@ class DocumentManager(object):
     def get_location(self):
         pass
 
-    def increase_mID(self):
+    def set_location(self, mID, dCf, dID):
         pass
 
 

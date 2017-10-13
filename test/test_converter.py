@@ -330,14 +330,8 @@ class TestConverterAppend(unittest.TestCase):
 
         settings['append'] = True
         source = os.path.abspath('test/resources/root3')
-        docindex_reader = DocIndexReader(
-            os.path.join(target, 'AVID.MAG.1000.1', 'Indices', 'docIndex.xml'))
-        mID, dCf, dID = docindex_reader.get_ids()
-        docindex = docindex_reader.get_index()
-
         converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager(mID, dCf, dID), settings,
-                              docindex)
+                              LocalDocumentManager(), settings)
         converter.run()
 
         # Check that the tiffs exist
@@ -360,6 +354,10 @@ class TestConverterAppend(unittest.TestCase):
                          'docCollection1', '5', '1.tif')))
 
         # Check docIndex.xml
+
+        docindex_reader = DocIndexReader(
+            os.path.join(target, 'AVID.MAG.1000.1', 'Indices', 'docIndex.xml'))
+        docindex = docindex_reader.get_index()
 
         self.assertEqual(5, len(docindex))
         for i in range(1, 5):

@@ -4,6 +4,7 @@ import tiff.filehandler
 from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
 from ff.folder import *
+from siarddk.docindex import DocIndexReader
 
 from util.logger import logger
 
@@ -52,8 +53,7 @@ class Converter(object):
             conversion_dir: os.path.abspath,
             name: str,
             docmanager: siarddk.docmanager.DocumentManager,
-            settings: dict,
-            old_docindex=None
+            settings: dict
     ):
         self.source = source
         self.target = target
@@ -62,12 +62,23 @@ class Converter(object):
         self.docmanager = docmanager
         self.settings = settings
 
-        self.docindex_builder = siarddk.docindex.DocIndexBuilder(old_docindex)
         self.complex_converter = ComplexConverter(conversion_dir)
 
         create_target_folder(target)
-        if not settings['append']:
+
+        if settings['append']:
+            docindex_reader = DocIndexReader(
+                os.path.join(target, '%s.1' % name, 'Indices', 'docIndex.xml'))
+            mID, dCf, dID = docindex_reader.get_ids()
+            old_docindex = docindex_reader.get_index()
+        else:
             rename_old_av_folders(target, name)
+            mID, dCf, dID = (1, 1, 1)
+            old_docindex = None
+
+        self.docmanager.set_location(mID, dCf, dID)
+        self.docindex_builder = siarddk.docindex.DocIndexBuilder(old_docindex)
+
         create_conversion_folder(conversion_dir)
         clean_conversion_folder(conversion_dir)
 

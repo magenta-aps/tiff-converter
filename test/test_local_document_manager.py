@@ -87,7 +87,6 @@ class TestLocalDocumentManager(unittest.TestCase):
         self.assertEqual(1, d.dCf)
         self.assertEqual(4, d.dID)
 
-
     def add(self, n):
         """
         Add n docs to Documents
