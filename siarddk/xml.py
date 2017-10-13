@@ -25,36 +25,41 @@ class IndexBuilder(object):
         element.text = value
 
     def build(self) -> etree.Element:
+        if self.is_valid():
+            return self.index
+        return None
+
+    def to_string(self):
+        return str(etree.tostring(self.build()), 'utf-8')
+
+    def write(self, indices_path: os.path.abspath):
+        """
+        Validate the index file and write it to disk
+        :return: None
+        """
+
+        logger.info('Writing %s.xml to disk...' % self.NAME)
+
+        if not os.path.isdir(indices_path):
+            os.makedirs(indices_path)
+        index_path = os.path.join(indices_path, '%s.xml' % self.NAME)
+        with open(index_path, 'w') as index:
+            index.write(self.to_string())
+
+        logger.info('%s.xml written to disk' % self.NAME)
+
+    def is_valid(self) -> bool:
         logger.info('Validating %s.xml...' % self.NAME)
         with open('siarddk/%s.xsd' % self.NAME, 'r') as f:
             xsd = etree.XMLSchema(etree.parse(f))
             is_valid = xsd.validate(self.index)
             if is_valid:
                 logger.info('%s.xml valid' % self.NAME)
+                return True
             else:
                 logger.error(
                     '%s.xml NOT valid! Error: %s' % (self.NAME, xsd.error_log))
-        return self.index
-
-    def to_string(self):
-        return str(etree.tostring(self.build()), 'utf-8')
-
-            # def write(self, target: os.path.abspath):
-    #     """
-    #     Validate the index file and write it to disk
-    #     :return: None
-    #     """
-    #
-    #     logger.info('Writing %s.xml to disk...' % self.NAME)
-    #
-    #     indices_path = os.path.join(target, '%s.1' % self.NAME, 'Indices')
-    #     if not os.path.isdir(indices_path):
-    #         os.mkdir(indices_path)
-    #     index_path = os.path.join(indices_path, '%s.xml' % self.NAME)
-    #     with open(index_path, 'w') as docindex:
-    #         docindex.write(self.docindex_builder.to_string())
-    #
-    #     logger.info('%s.xml written to disk' % self.NAME)
+                return False
 
 
 class IndexReader(object):

@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 import unittest
 
@@ -66,11 +67,11 @@ class TestDocIndexReader(unittest.TestCase):
 class TestDocIndexBuilder(unittest.TestCase):
     def setUp(self):
         self.builder = DocIndexBuilder()
-        self.docIndex_tag = etree.QName(self.builder.build())
         self.builder.add_doc('1', 'docCollection1', '1', 'name.tif', 'tif')
         self.doc1 = self.builder.build()[0]
         self.builder.add_doc('2', 'docCollection2', '2', 'name2.jpg', 'wav')
         self.doc2 = self.builder.build()[1]
+        self.docIndex_tag = etree.QName(self.builder.build())
 
     def test_should_store_type_docindex(self):
         self.assertEqual('docIndex', self.builder.NAME)
@@ -227,3 +228,16 @@ class TestDocIndexBuilder(unittest.TestCase):
                    '<dCf>docCollection2</dCf><oFn>name2.jpg</oFn>' \
                    '<aFt>wav</aFt></doc></docIndex>'
         self.assertEqual(expected, self.builder.to_string())
+
+    def test_docindex_should_be_valid(self):
+        self.assertTrue(self.builder.is_valid())
+
+    def test_should_write_docindex_to_disk(self):
+        target = os.path.join(tempfile.gettempdir(), '_docindex')
+        indices_path = os.path.join(target, 'AVID.MAG.1000.1', 'Indices')
+        self.builder.write(indices_path)
+
+        self.assertTrue(
+            os.path.isfile(os.path.join(indices_path, 'docIndex.xml')))
+
+        shutil.rmtree(target)
