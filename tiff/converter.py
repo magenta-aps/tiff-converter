@@ -99,16 +99,9 @@ class Converter(object):
             clean_conversion_folder(self.conversion_dir)
             next_file = filehandler.get_next_file()
 
-        # TODO: move this elsewhere... (responsibility erosion)
         # Write docIndex to file
-        logger.info('Writing docIndex.xml to disk...')
         indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
-        if not self.settings['append']:
-            os.mkdir(indices_path)
-        docindex_path = os.path.join(indices_path, 'docIndex.xml')
-        with open(docindex_path, 'w') as docindex:
-            docindex.write(self.docindex_builder.to_string())
-        logger.info('docIndex.xml written to disk')
+        self.docindex_builder.write(indices_path)
 
         self.close()
         logger.info('Conversion done!')
