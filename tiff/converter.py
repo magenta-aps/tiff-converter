@@ -30,7 +30,7 @@ class ComplexConverter(object):
             pdf = self.powerpoint_converter.convert(source)
         elif ext == 'pdf':
             pdf = source
-        elif ext == 'jpg':
+        elif ext in ['bmp', 'jpg', 'png']:
             return self.tiff_converter.image_magick_convert(source, target)
 
         if pdf:
