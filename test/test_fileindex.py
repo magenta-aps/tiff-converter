@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 import unittest
 
 from siarddk.fileindex import FileIndex
@@ -83,5 +85,15 @@ class TestFileIndexReader(unittest.TestCase):
     def test_should_store_type_fileindex(self):
         self.assertEqual('fileIndex', self.fileindex.NAME)
 
-    # def test_fileindex_xml_should_be_valid(self):
-    #     pass
+    def test_fileindex_xml_should_be_valid(self):
+        self.assertTrue(self.fileindex.is_valid())
+
+    def test_should_write_fileindex_to_disk(self):
+        target = os.path.join(tempfile.gettempdir(), '_fileindex')
+        indices_path = os.path.join(target, 'AVID.MAG.1000.1', 'Indices')
+        self.fileindex.write(indices_path)
+
+        self.assertTrue(
+            os.path.isfile(os.path.join(indices_path, 'fileIndex.xml')))
+
+        shutil.rmtree(target)
