@@ -12,12 +12,7 @@ class DocumentManager(object):
 class LocalDocumentManager(DocumentManager):
 
     def __init__(self, mID=1, dCf=1, dID=1):
-        self.mID = mID
-        self.dCf = dCf
-        self.dID = dID
-
-        if mID != 1 or dCf != 1 or dID != 1:
-            self._increment_values()
+        self.set_location(mID, dCf, dID)
 
     def get_location(self):
         dID = self.dID
@@ -27,6 +22,14 @@ class LocalDocumentManager(DocumentManager):
         self._increment_values()
 
         return mID, dCf, dID
+
+    def set_location(self, mID, dCf, dID):
+        self.mID = mID
+        self.dCf = dCf
+        self.dID = dID
+
+        if mID != 1 or dCf != 1 or dID != 1:
+            self._increment_values()
 
     def _increment_values(self):
         if self.dID % self.MAX == 0:

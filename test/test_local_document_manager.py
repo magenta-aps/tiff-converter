@@ -66,6 +66,28 @@ class TestLocalDocumentManager(unittest.TestCase):
         d = docmanager.LocalDocumentManager(1, 10000, 100000000)
         self.assertEqual((2, 10001, 100000001), d.get_location())
 
+    def test_should_set_mID_3(self):
+        d = docmanager.LocalDocumentManager()
+        d.set_location(3, 1, 1)
+        self.assertEqual(3, d.mID)
+        self.assertEqual(1, d.dCf)
+        self.assertEqual(2, d.dID)
+
+    def test_should_set_dCf_3(self):
+        d = docmanager.LocalDocumentManager()
+        d.set_location(1, 3, 1)
+        self.assertEqual(1, d.mID)
+        self.assertEqual(3, d.dCf)
+        self.assertEqual(2, d.dID)
+
+    def test_should_set_dID_3(self):
+        d = docmanager.LocalDocumentManager()
+        d.set_location(1, 1, 3)
+        self.assertEqual(1, d.mID)
+        self.assertEqual(1, d.dCf)
+        self.assertEqual(4, d.dID)
+
+
     def add(self, n):
         """
         Add n docs to Documents
