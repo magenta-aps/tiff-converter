@@ -9,9 +9,7 @@ from siarddk.fileindex import FileIndex
 class TestFileIndexReader(unittest.TestCase):
     def setUp(self):
         self.fileindex = FileIndex(os.path.abspath('test/resources/siarddk'),
-                                   os.path.abspath(
-                                       'test/resources/siarddk/AVID.MAG.1000.1/'
-                                       'Indices/fileIndex.xml'))
+                                   'AVID.MAG.1000')
 
     def test_should_read_1st_file(self):
         index = self.fileindex.get_index()
