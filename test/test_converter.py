@@ -101,6 +101,22 @@ class TestComplexConverter(unittest.TestCase):
                                    os.path.join(self.conversion_dir,
                                                 'temp.tif')))
 
+    def test_should_convert_tif_correctly(self):
+        source = os.path.abspath(
+            'test/resources/siarddk/AVID.MAG.1000.1/'
+            'Documents/docCollection1/1/1.tif')
+        self.assertTrue(
+            self.converter.convert(source,
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
+
+    def test_should_convert_tiff_correctly(self):
+        source = os.path.abspath('test/resources/sample.tiff')
+        self.assertTrue(
+            self.converter.convert(source,
+                                   os.path.join(self.conversion_dir,
+                                                'temp.tif')))
+
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
 class TestConverter(unittest.TestCase):
