@@ -65,8 +65,16 @@ class TestDocIndexReader(unittest.TestCase):
         self.d = DocIndexHandler(self.path)
 
 
-class TestDocIndexBuilder(unittest.TestCase):
+class TestHelper(unittest.TestCase):
     def setUp(self):
+        self.target = os.path.join(tempfile.gettempdir(), '_docindex')
+        self.indices_path = os.path.join(self.target, 'AVID.MAG.1000.1',
+                                         'Indices')
+
+
+class TestDocIndexBuilder(TestHelper):
+    def setUp(self):
+        super().setUp()
         self.builder = DocIndexHandler()
         self.builder.add_doc('1', 'docCollection1', '1', 'name.tif', 'tif')
         self.doc1 = self.builder.build()[0]
@@ -74,9 +82,6 @@ class TestDocIndexBuilder(unittest.TestCase):
         self.doc2 = self.builder.build()[1]
         self.docIndex_tag = etree.QName(self.builder.build())
 
-        self.target = os.path.join(tempfile.gettempdir(), '_docindex')
-        self.indices_path = os.path.join(self.target, 'AVID.MAG.1000.1',
-                                         'Indices')
         self.builder.write(self.indices_path)
 
     def tearDown(self):
@@ -258,3 +263,17 @@ class TestDocIndexBuilder(unittest.TestCase):
         handler = DocIndexHandler()
         handler.write(self.indices_path)
         self.assertFalse(os.path.isfile(docindex_path))
+
+
+@unittest.skip('Skipped in order to save time...')
+class TestStressDocIndexHandler(TestHelper):
+    def tearDown(self):
+        shutil.rmtree(self.target)
+
+    def test_should_handle_10million_docs(self):
+        handler = DocIndexHandler()
+        for i in range(1, 1000000):
+            handler.add_doc('1', 'docCollection1', str(i), 'name.tif', 'tif')
+        handler.write(self.indices_path)
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.indices_path, 'docIndex.xml')))
