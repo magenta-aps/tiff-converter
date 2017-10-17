@@ -4,7 +4,7 @@ import tiff.filehandler
 from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
 from ff.folder import *
-from siarddk.docindex import DocIndexReader
+from siarddk.docindex import DocIndexHandler
 
 from util.logger import logger
 
@@ -67,17 +67,15 @@ class Converter(object):
         create_target_folder(target)
 
         if settings['append']:
-            docindex_reader = DocIndexReader(
+            self.docindex_handler = DocIndexHandler(
                 os.path.join(target, '%s.1' % name, 'Indices', 'docIndex.xml'))
-            mID, dCf, dID = docindex_reader.get_ids()
-            old_docindex = docindex_reader.get_index()
+            mID, dCf, dID = self.docindex_handler.get_ids()
         else:
             rename_old_av_folders(target, name)
             mID, dCf, dID = (1, 1, 1)
-            old_docindex = None
+            self.docindex_handler = DocIndexHandler()
 
         self.docmanager.set_location(mID, dCf, dID)
-        self.docindex_builder = siarddk.docindex.DocIndexBuilder(old_docindex)
 
         create_conversion_folder(conversion_dir)
         clean_conversion_folder(conversion_dir)
@@ -104,7 +102,7 @@ class Converter(object):
                 next_file, os.path.join(folder, '1.tif'))
             if success:
                 oFn = os.path.basename(next_file)
-                self.docindex_builder.add_doc(str(mID), 'docCollection%s' % dCf,
+                self.docindex_handler.add_doc(str(mID), 'docCollection%s' % dCf,
                                               str(dID), oFn, 'tif')
             else:
                 os.rmdir(folder)
@@ -114,7 +112,7 @@ class Converter(object):
 
         # Write docIndex to file
         indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
-        self.docindex_builder.write(indices_path)
+        self.docindex_handler.write(indices_path)
 
         self.close()
         logger.info('Conversion done!')

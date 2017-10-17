@@ -8,7 +8,7 @@ import freezegun
 
 from siarddk.docmanager import LocalDocumentManager
 from tiff.converter import Converter, ComplexConverter
-from siarddk.docindex import DocIndexReader
+from siarddk.docindex import DocIndexHandler
 
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
@@ -227,7 +227,7 @@ class TestConverter(unittest.TestCase):
 
         self.converter.run()
 
-        docIndex = self.converter.docindex_builder.build()
+        docIndex = self.converter.docindex_handler.build()
         doc1 = docIndex[0]
         doc2 = docIndex[1]
 
@@ -358,9 +358,9 @@ class TestConverterAppend(unittest.TestCase):
 
         # Check docIndex.xml
 
-        docindex_reader = DocIndexReader(
+        docindex_handler = DocIndexHandler(
             os.path.join(target, 'AVID.MAG.1000.1', 'Indices', 'docIndex.xml'))
-        docindex = docindex_reader.get_index()
+        docindex = docindex_handler.get_index()
 
         self.assertEqual(5, len(docindex))
         for i in range(1, 5):

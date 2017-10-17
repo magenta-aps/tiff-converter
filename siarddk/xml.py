@@ -9,15 +9,36 @@ def print_element(element):
     print(str(etree.tostring(element, pretty_print=True), 'utf-8'))
 
 
-class IndexBuilder(object):
+class IndexHandler(object):
     """
     This class should not be instantiated directly - use subclasses instead
     """
     NAME = ''
     NS = 'http://www.sa.dk/xmlns/diark/1.0'
+    NSMAP = {
+        None: NS,
+        'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
+    }
 
-    def __init__(self):
-        self.index = None
+    def __init__(self, path: os.path.abspath):
+        """
+        :param path: Full path to index file
+        """
+        if path:
+            with open(path, 'r') as f:
+                self.index = etree.parse(f).getroot()
+            # index_type = os.path.splitext(os.path.basename(path))[0]
+            with open('siarddk/%s.xsd' % self.NAME, 'r') as f:
+                xsd = etree.XMLSchema(etree.parse(f))
+                xsd.assertValid(self.index)
+        else:
+            tag = etree.QName(self.NS, self.NAME)
+            self.index = etree.Element(tag, nsmap=self.NSMAP)
+            schema_location = etree.QName(self.NSMAP['xsi'], 'schemaLocation')
+            self.index.set(schema_location,
+                           'http://www.sa.dk/xmlns/diark/1.0 '
+                           '../Schemas/standard/%s.xsd' % self.NAME)
+        logger.info('Initialized %s handler' % self.NAME)
 
     def add_element_child(self, element: etree.Element, name: str, value: str):
         tag = etree.QName(self.NS, name)
@@ -28,6 +49,9 @@ class IndexBuilder(object):
         if self.is_valid():
             return self.index
         return None
+
+    def get_index(self):
+        return self.index
 
     def to_string(self):
         return str(etree.tostring(self.build()), 'utf-8')
@@ -60,16 +84,3 @@ class IndexBuilder(object):
                 logger.error(
                     '%s.xml NOT valid! Error: %s' % (self.NAME, xsd.error_log))
                 return False
-
-
-class IndexReader(object):
-    def __init__(self, path: os.path.abspath):
-        with open(path, 'r') as f:
-            self.index = etree.parse(f).getroot()
-        index_type = os.path.splitext(os.path.basename(path))[0]
-        with open('siarddk/%s.xsd' % index_type, 'r') as f:
-            xsd = etree.XMLSchema(etree.parse(f))
-            xsd.assertValid(self.index)
-
-    def get_index(self):
-        return self.index

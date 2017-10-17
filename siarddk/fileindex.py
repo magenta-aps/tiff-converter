@@ -1,12 +1,10 @@
 import hashlib
 
-from lxml import etree
-
 from siarddk.xml import *
 from tiff.filehandler import LocalFileHandler
 
 
-class FileIndex(IndexBuilder, IndexReader):
+class FileIndex(IndexHandler):
     NS = 'http://www.sa.dk/xmlns/diark/1.0'
     NAME = 'fileIndex'
 
@@ -16,12 +14,9 @@ class FileIndex(IndexBuilder, IndexReader):
         :param name: the name of the archival version, e.g. AVID.MAG.1000
         """
 
-        # TODO: this is getting ugly... use compositional design instead
-
         path = os.path.join(target, '%s.1' % name, 'Indices', 'fileIndex.xml')
 
-        IndexBuilder.__init__(self)
-        IndexReader.__init__(self, path if os.path.isfile(path) else None)
+        IndexHandler.__init__(self, path if os.path.isfile(path) else None)
         self.target = target
 
     def add_file(self, path: os.path.abspath):

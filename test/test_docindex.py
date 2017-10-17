@@ -5,13 +5,13 @@ import unittest
 
 from lxml import etree
 
-from siarddk.docindex import DocIndexBuilder, DocIndexReader
+from siarddk.docindex import DocIndexHandler  # , DocIndexReader
 
 
 class TestDocIndexReader(unittest.TestCase):
     def setUp(self):
         self.path = os.path.join(tempfile.gettempdir(), 'docIndex.xml')
-        self.builder = DocIndexBuilder()
+        self.builder = DocIndexHandler()
         self.builder.add_doc('1', 'docCollection1', '1', 'file1.tif', 'tif')
 
     def tearDown(self):
@@ -45,11 +45,11 @@ class TestDocIndexReader(unittest.TestCase):
         with open(self.path, 'w') as f:
             f.write(str(etree.tostring(self.builder.index), 'utf-8'))
         with self.assertRaises(etree.DocumentInvalid):
-            DocIndexReader(self.path)
+            DocIndexHandler(self.path)
 
     def test_should_return_docindex(self):
         self.write_to_file_and_read_docindex()
-        docindex = self.d.get_index()
+        docindex = self.d.build()
         self.assertEqual(1, len(docindex))
         doc1 = docindex[0]
         self.assertEqual('1', doc1[0].text)
@@ -61,17 +61,25 @@ class TestDocIndexReader(unittest.TestCase):
     def write_to_file_and_read_docindex(self):
         with open(self.path, 'w') as f:
             f.write(self.builder.to_string())
-        self.d = DocIndexReader(self.path)
+        self.d = DocIndexHandler(self.path)
 
 
 class TestDocIndexBuilder(unittest.TestCase):
     def setUp(self):
-        self.builder = DocIndexBuilder()
+        self.builder = DocIndexHandler()
         self.builder.add_doc('1', 'docCollection1', '1', 'name.tif', 'tif')
         self.doc1 = self.builder.build()[0]
         self.builder.add_doc('2', 'docCollection2', '2', 'name2.jpg', 'wav')
         self.doc2 = self.builder.build()[1]
         self.docIndex_tag = etree.QName(self.builder.build())
+
+        self.target = os.path.join(tempfile.gettempdir(), '_docindex')
+        self.indices_path = os.path.join(self.target, 'AVID.MAG.1000.1',
+                                         'Indices')
+        self.builder.write(self.indices_path)
+
+    def tearDown(self):
+        shutil.rmtree(self.target)
 
     def test_should_store_type_docindex(self):
         self.assertEqual('docIndex', self.builder.NAME)
@@ -92,14 +100,14 @@ class TestDocIndexBuilder(unittest.TestCase):
             self.builder.build().get('{%s}' % name_space + 'schemaLocation'))
 
     def test_should_store_existing_docindex(self):
-        docindex_old = self.builder.build()
-        builder_new = DocIndexBuilder(docindex_old)
+        builder_new = DocIndexHandler(
+            os.path.join(self.indices_path, 'docIndex.xml'))
         docindex_new = builder_new.build()
         self.assertEqual(2, len(docindex_new))
 
     def test_should_append_document_to_existing_docindex(self):
-        docindex_old = self.builder.build()
-        builder_new = DocIndexBuilder(docindex_old)
+        builder_new = DocIndexHandler(
+            os.path.join(self.indices_path, 'docIndex.xml'))
         builder_new.add_doc('3', 'docCollection3', '3', 'name3.tif', 'tif')
         docindex_new = builder_new.build()
         self.assertEqual(3, len(docindex_new))
@@ -233,11 +241,5 @@ class TestDocIndexBuilder(unittest.TestCase):
         self.assertTrue(self.builder.is_valid())
 
     def test_should_write_docindex_to_disk(self):
-        target = os.path.join(tempfile.gettempdir(), '_docindex')
-        indices_path = os.path.join(target, 'AVID.MAG.1000.1', 'Indices')
-        self.builder.write(indices_path)
-
         self.assertTrue(
-            os.path.isfile(os.path.join(indices_path, 'docIndex.xml')))
-
-        shutil.rmtree(target)
+            os.path.isfile(os.path.join(self.indices_path, 'docIndex.xml')))
