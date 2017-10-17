@@ -1,3 +1,4 @@
+import mock
 import os
 import shutil
 import tempfile
@@ -243,3 +244,17 @@ class TestDocIndexBuilder(unittest.TestCase):
     def test_should_write_docindex_to_disk(self):
         self.assertTrue(
             os.path.isfile(os.path.join(self.indices_path, 'docIndex.xml')))
+
+    @mock.patch('siarddk.xml.IndexHandler.build')
+    def test_to_string_should_return_none_when_index_invalid(self, mock):
+        mock.return_value = None
+        self.assertIsNone(self.builder.to_string())
+
+    @mock.patch('siarddk.xml.IndexHandler.to_string')
+    def test_to_string_should_return_none_when_index_invalid(self, mock):
+        mock.return_value = None
+        docindex_path = os.path.join(self.indices_path, 'docIndex.xml')
+        os.remove(docindex_path)
+        handler = DocIndexHandler()
+        handler.write(self.indices_path)
+        self.assertFalse(os.path.isfile(docindex_path))

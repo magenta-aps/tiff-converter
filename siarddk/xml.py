@@ -54,23 +54,27 @@ class IndexHandler(object):
         return self.index
 
     def to_string(self):
-        return str(etree.tostring(self.build()), 'utf-8')
+        index = self.build()
+        return str(etree.tostring(index), 'utf-8') \
+            if index is not None else None
 
     def write(self, indices_path: os.path.abspath):
         """
         Validate the index file and write it to disk
-        :return: None
         """
 
         logger.info('Writing %s.xml to disk...' % self.NAME)
 
-        if not os.path.isdir(indices_path):
-            os.makedirs(indices_path)
-        index_path = os.path.join(indices_path, '%s.xml' % self.NAME)
-        with open(index_path, 'w') as index:
-            index.write(self.to_string())
-
-        logger.info('%s.xml written to disk' % self.NAME)
+        index_str = self.to_string()
+        if index_str:
+            if not os.path.isdir(indices_path):
+                os.makedirs(indices_path)
+            index_path = os.path.join(indices_path, '%s.xml' % self.NAME)
+            with open(index_path, 'w') as index:
+                index.write(self.to_string())
+                logger.info('%s.xml written to disk' % self.NAME)
+        else:
+            logger.error('%s.xml NOT written to disk' % self.NAME)
 
     def is_valid(self) -> bool:
         logger.info('Validating %s.xml...' % self.NAME)

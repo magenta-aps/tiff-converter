@@ -20,6 +20,8 @@ class FileIndex(IndexHandler):
         self.target = target
 
     def add_file(self, path: os.path.abspath):
+        logger.debug('Adding %s to fileIndex.xml...' % path)
+
         foN, fiN = os.path.split(path)
         foN = os.path.relpath(foN, self.target).replace('/', '\\')
 
@@ -35,29 +37,35 @@ class FileIndex(IndexHandler):
             self.add_element_child(f, 'fiN', fiN)
             self.add_element_child(f, 'md5', self._get_md5sum(path))
 
-        # log stuff
+        logger.debug('Added %s to fileIndex.xml' % path)
 
     def add_folders(self, folders: list):
         for folder in folders:
+            logger.info('Adding %s to fileIndex.xml...' % folder)
             filehandler = LocalFileHandler(folder)
             next_file = filehandler.get_next_file()
             while next_file:
                 self.add_file(next_file)
                 next_file = filehandler.get_next_file()
+            logger.info('Added %s to fileIndex.xml' % folder)
 
     def remove_all(self):
         """
         Remove all files except for those in the Tables folder
         """
+        logger.info('Removing all files (except tables) from fileIndex.xml...')
         for f in self.get_index():
             foN = f[0].text
             if not foN.split('\\')[1] == 'Tables':
                 f.getparent().remove(f)
+        logger.info('Removed all files (except tables) from fileIndex.xml')
 
     @staticmethod
     def _get_md5sum(path: os.path.abspath) -> str:
+        logger.debug('Calculating MD5SUM for %s...' % path)
         hash_md5 = hashlib.md5()
         with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 hash_md5.update(chunk)
+        logger.debug('Calculated MD5SUM for %s...' % path)
         return hash_md5.hexdigest().upper()
