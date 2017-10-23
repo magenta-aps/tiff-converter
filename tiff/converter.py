@@ -75,6 +75,12 @@ class Converter(object):
     def run(self):
         logger.info('Starting conversion...')
 
+        self._new_target_run()
+
+        self.close()
+        logger.info('Conversion done!')
+
+    def _new_target_run(self):
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
         create_target_folder(self.target)
 
@@ -113,6 +119,3 @@ class Converter(object):
         # Write docIndex to file
         indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
         self.docindex_handler.write(indices_path)
-
-        self.close()
-        logger.info('Conversion done!')
