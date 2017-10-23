@@ -75,7 +75,10 @@ class Converter(object):
     def run(self):
         logger.info('Starting conversion...')
 
-        self._new_target_run()
+        if self.settings['in-place']:
+            self._reuse_source_as_target_run()
+        else:
+            self._new_target_run()
 
         self.close()
         logger.info('Conversion done!')
@@ -119,3 +122,27 @@ class Converter(object):
         # Write docIndex to file
         indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
         self.docindex_handler.write(indices_path)
+
+    def _reuse_source_as_target_run(self):
+
+        # The source must be the folder where the AVID.XYZ.nnnn.m's are located
+
+        self.docindex_handler = DocIndexHandler(
+            os.path.join(self.source, '%s.1' % self.name, 'Indices',
+                         'docIndex.xml'))
+        docindex = self.docindex_handler.get_index()
+
+        for doc in docindex:
+            dID = doc[0].text
+            mID = doc[1].text
+            dCf = doc[2].text
+            path = os.path.join(self.source, '%s.%s' % (self.name, mID),
+                                'Documents', dCf, dID)
+            source_file = os.path.join(path, os.listdir(path)[0])
+
+            success = self.complex_converter.convert(
+                source_file, os.path.join(path, '1.tif'))
+            if success:
+                os.remove(source_file)
+
+            clean_conversion_folder(self.conversion_dir)

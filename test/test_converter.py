@@ -124,7 +124,8 @@ class TestConverter(unittest.TestCase):
             'tiff': {
                 'resolution': '150'
             },
-            'append': False
+            'append': False,
+            'in-place': False
         }
         self.source = os.path.abspath('test/resources/root')
         self.target = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
@@ -344,7 +345,8 @@ class TestConverterAppend(unittest.TestCase):
             'tiff': {
                 'resolution': '150'
             },
-            'append': False
+            'append': False,
+            'in-place': False
         }
         source = os.path.abspath('test/resources/root')
         target = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
@@ -408,3 +410,66 @@ class TestConverterAppend(unittest.TestCase):
             shutil.rmtree(target)
         if os.path.isdir(conversion_dir):
             shutil.rmtree(conversion_dir)
+
+
+@unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
+class TestSourceEqualsTargetConversion(unittest.TestCase):
+    def setUp(self):
+        self.settings = {
+            'tiff': {
+                'resolution': '150'
+            },
+            'append': False,
+            'in-place': True
+        }
+        self.folder = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
+        if os.path.isdir(self.folder):
+            shutil.rmtree(self.folder)
+        self.source = self.folder
+        shutil.copytree(
+            os.path.abspath('test/resources/siarddk2/AVID.MAG.1000.1/'),
+            os.path.join(self.folder, 'AVID.MAG.1000.1'))
+        shutil.copytree(
+            os.path.abspath('test/resources/siarddk2/AVID.MAG.1000.2/'),
+            os.path.join(self.folder, 'AVID.MAG.1000.2'))
+        self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
+        self.converter = Converter(self.source, None,
+                                   self.conversion_dir, 'AVID.MAG.1000',
+                                   self.settings)
+
+    def tearDown(self):
+        if os.path.isdir(self.folder):
+            shutil.rmtree(self.folder)
+        if os.path.isdir(self.conversion_dir):
+            shutil.rmtree(self.conversion_dir)
+
+    def test_sample_tif_should_exist_after_conversion(self):
+        self.converter.run()
+
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', 'sample.doc')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '2', '1.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '2', 'sample.doc')))
+
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '3', '1.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '3', 'sample.doc')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '4', '1.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '4', 'sample.doc')))
+
+    # Should not remove file when conversion fails
