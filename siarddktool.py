@@ -5,7 +5,6 @@ import sys
 import click
 
 import tiff.converter
-from siarddk.docmanager import LocalDocumentManager
 from siarddk.fileindex import FileIndex
 from config import settings
 
@@ -45,7 +44,7 @@ def convert(ctx, source, tempdir, append):
     settings['append'] = append
     converter = tiff.converter.Converter(
         os.path.abspath(source), ctx.obj['target'], tempdir, ctx.obj['name'],
-        LocalDocumentManager(), settings)
+        settings)
     converter.run()
 
 

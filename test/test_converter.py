@@ -6,7 +6,6 @@ import unittest
 import mock
 import freezegun
 
-from siarddk.docmanager import LocalDocumentManager
 from tiff.converter import Converter, ComplexConverter
 from siarddk.docindex import DocIndexHandler
 
@@ -134,7 +133,7 @@ class TestConverter(unittest.TestCase):
         self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
         self.converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.MAG.1000',
-                                   LocalDocumentManager(), self.settings)
+                                   self.settings)
 
     def tearDown(self):
         if os.path.isdir(self.target):
@@ -193,7 +192,7 @@ class TestConverter(unittest.TestCase):
     def test_should_create_folder_AVID_XYZ_2000_1(self):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.XYZ.2000',
-                              LocalDocumentManager(), self.settings)
+                              self.settings)
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(
@@ -272,7 +271,7 @@ class TestConverter(unittest.TestCase):
         self.source = os.path.abspath('test/resources/root2')
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager(), self.settings)
+                              self.settings)
         converter.run()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -282,7 +281,7 @@ class TestConverter(unittest.TestCase):
         open(os.path.join(self.conversion_dir, 'file.empty'), 'w').close()
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager(), self.settings)
+                              self.settings)
         converter.close()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -315,9 +314,14 @@ class TestConverter(unittest.TestCase):
         self.assertEqual('150', self.converter.settings['tiff']['resolution'])
         self.converter.close()
 
-    def test_should_create_target_folder_in_constructor(self):
-        self.assertTrue(os.path.isdir(self.target))
+    def test_should_create_target_folder(self):
+        self.source = os.path.abspath('test/resources/root3')
+        converter = Converter(self.source, self.target,
+                              self.conversion_dir, 'AVID.MAG.1000',
+                              self.settings)
+        converter.run()
         self.converter.close()
+        self.assertTrue(os.path.isdir(self.target))
 
     @freezegun.freeze_time('2017-01-01 12:00:00')
     def test_should_rename_target_folder_if_exists(self):
@@ -326,10 +330,9 @@ class TestConverter(unittest.TestCase):
         self.source = os.path.abspath('test/resources/root2')
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager(), self.settings)
-        converter.close()
+                              self.settings)
+        converter.run()
         self.converter.close()
-        self.assertFalse(os.path.isdir(path_to_rename))
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1_2017-01-01_120000')))
 
@@ -349,7 +352,7 @@ class TestConverterAppend(unittest.TestCase):
             shutil.rmtree(target)
         conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
         converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager(), settings)
+                              settings)
         converter.run()
 
         # Add new file to the existing AV
@@ -357,7 +360,7 @@ class TestConverterAppend(unittest.TestCase):
         settings['append'] = True
         source = os.path.abspath('test/resources/root3')
         converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
-                              LocalDocumentManager(), settings)
+                              settings)
         converter.run()
 
         # Check that the tiffs exist

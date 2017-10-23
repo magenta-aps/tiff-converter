@@ -52,30 +52,17 @@ class Converter(object):
             target: os.path.abspath,
             conversion_dir: os.path.abspath,
             name: str,
-            docmanager: siarddk.docmanager.DocumentManager,
             settings: dict
     ):
         self.source = source
         self.target = target
         self.conversion_dir = conversion_dir
         self.name = name
-        self.docmanager = docmanager
         self.settings = settings
 
         self.complex_converter = ComplexConverter(conversion_dir)
-
-        create_target_folder(target)
-
-        if settings['append']:
-            self.docindex_handler = DocIndexHandler(
-                os.path.join(target, '%s.1' % name, 'Indices', 'docIndex.xml'))
-            mID, dCf, dID = self.docindex_handler.get_ids()
-        else:
-            rename_old_av_folders(target, name)
-            mID, dCf, dID = (1, 1, 1)
-            self.docindex_handler = DocIndexHandler()
-
-        self.docmanager.set_location(mID, dCf, dID)
+        self.docindex_handler = DocIndexHandler()
+        self.docmanager = siarddk.docmanager.LocalDocumentManager()
 
         create_conversion_folder(conversion_dir)
         clean_conversion_folder(conversion_dir)
@@ -87,7 +74,20 @@ class Converter(object):
 
     def run(self):
         logger.info('Starting conversion...')
+
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
+        create_target_folder(self.target)
+
+        if self.settings['append']:
+            self.docindex_handler = DocIndexHandler(
+                os.path.join(self.target, '%s.1' % self.name, 'Indices',
+                             'docIndex.xml'))
+            mID, dCf, dID = self.docindex_handler.get_ids()
+        else:
+            rename_old_av_folders(self.target, self.name)
+            mID, dCf, dID = (1, 1, 1)
+
+        self.docmanager.set_location(mID, dCf, dID)
 
         success = True
         next_file = filehandler.get_next_file()
