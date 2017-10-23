@@ -472,4 +472,33 @@ class TestSourceEqualsTargetConversion(unittest.TestCase):
             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection2', '4', 'sample.doc')))
 
-    # Should not remove file when conversion fails
+    @mock.patch('tiff.pdfconverter.MSOfficeToPdfConverter.convert')
+    def test_should_not_remove_sample_doc_when_conversion_fails(self, mock):
+        mock.return_value = None
+        self.converter.run()
+
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', 'sample.doc')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '2', '1.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '2', 'sample.doc')))
+
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '3', '1.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '3', 'sample.doc')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '4', '1.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '4', 'sample.doc')))
