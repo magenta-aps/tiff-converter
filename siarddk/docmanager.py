@@ -11,7 +11,8 @@ class DocumentManager(object):
 
 class LocalDocumentManager(DocumentManager):
 
-    def __init__(self, mID=1, dCf=1, dID=1):
+    def __init__(self, append, mID=1, dCf=1, dID=1):
+        self.append = append
         self.set_location(mID, dCf, dID)
 
     def get_location(self):
@@ -28,7 +29,7 @@ class LocalDocumentManager(DocumentManager):
         self.dCf = dCf
         self.dID = dID
 
-        if mID != 1 or dCf != 1 or dID != 1:
+        if mID != 1 or dCf != 1 or dID != 1 or self.append:
             self._increment_values()
 
     def _increment_values(self):

@@ -62,7 +62,8 @@ class Converter(object):
 
         self.complex_converter = ComplexConverter(conversion_dir)
         self.docindex_handler = DocIndexHandler()
-        self.docmanager = siarddk.docmanager.LocalDocumentManager()
+        self.docmanager = siarddk.docmanager.LocalDocumentManager(
+            self.settings['append'])
 
         create_conversion_folder(conversion_dir)
         clean_conversion_folder(conversion_dir)

@@ -414,6 +414,9 @@ class TestConverterAppend(unittest.TestCase):
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
 class TestSourceEqualsTargetConversion(unittest.TestCase):
+    """
+    Testing in-place conversion
+    """
     def setUp(self):
         self.settings = {
             'tiff': {
