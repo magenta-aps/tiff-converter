@@ -39,9 +39,18 @@ def cli(ctx, target, name):
 @click.option('--append', is_flag=True, default=False,
               help='Use this option if you want to append data to an '
                    'already existing archival version')
+@click.option('--inplace', is_flag=True, default=False,
+              help='Perform in-place conversion (see documentation)')
 @click.pass_context
-def convert(ctx, source, tempdir, append):
+def convert(ctx, source, tempdir, append, inplace):
+    if append and inplace:
+        click.echo('The --append and --in-place options cannot be used '
+                   'simultaneously')
+        sys.exit()
+
     settings['append'] = append
+    settings['in-place'] = inplace
+
     converter = tiff.converter.Converter(
         os.path.abspath(source), ctx.obj['target'], tempdir, ctx.obj['name'],
         settings)

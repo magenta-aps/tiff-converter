@@ -23,7 +23,7 @@ $ python siarddktool.py --target path/to/target --name AVID.MAG.1000 convert --s
 ## In-place conversion
 Use this command to perform an in-place conversion:
 ````
-$ python siarddktool.py --name AVID.MAG.1000 convert --in-place --source path/to/source
+$ python siarddktool.py --name AVID.MAG.1000 convert --inplace --source path/to/source
 ````
 In this case the source folder must be the folder that contains the e.g. 
 `AVID.MAG.1000.n` folders. 
