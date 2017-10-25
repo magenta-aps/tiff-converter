@@ -86,7 +86,9 @@ class Converter(object):
 
     def _new_target_run(self):
         filehandler = tiff.filehandler.LocalFileHandler(self.source)
-        create_target_folder(self.target)
+        create_target_folder(self.target)  # only if in-place, move this to folder strategy
+
+        # Make folder strategy in folders.py
 
         if self.settings['append']:
             self.docindex_handler = DocIndexHandler(
@@ -94,7 +96,7 @@ class Converter(object):
                              'docIndex.xml'))
             mID, dCf, dID = self.docindex_handler.get_ids()
         else:
-            rename_old_av_folders(self.target, self.name)
+            rename_old_av_folders(self.target, self.name)  # move this to folder strategy
             mID, dCf, dID = (1, 1, 1)
 
         self.docmanager.set_location(mID, dCf, dID)
