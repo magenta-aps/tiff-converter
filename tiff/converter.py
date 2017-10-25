@@ -52,13 +52,15 @@ class Converter(object):
             target: os.path.abspath,
             conversion_dir: os.path.abspath,
             name: str,
-            settings: dict
+            settings: dict,
+            file_path_strategy: tiff.filehandler.FilePathStrategy
     ):
         self.source = source
         self.target = target
         self.conversion_dir = conversion_dir
         self.name = name
         self.settings = settings
+        self.file_path_strategy = file_path_strategy
 
         self.complex_converter = ComplexConverter(conversion_dir)
         self.docindex_handler = DocIndexHandler()
@@ -85,7 +87,6 @@ class Converter(object):
         logger.info('Conversion done!')
 
     def _new_target_run(self):
-        filehandler = tiff.filehandler.LocalFileHandler(self.source)
         create_target_folder(self.target)  # only if in-place, move this to folder strategy
 
         # Make folder strategy in folders.py
@@ -102,7 +103,7 @@ class Converter(object):
         self.docmanager.set_location(mID, dCf, dID)
 
         success = True
-        next_file = filehandler.get_next_file()
+        next_file = self.file_path_strategy.get_next()
         while next_file:
             if success:
                 mID, dCf, dID = self.docmanager.get_location()
@@ -120,7 +121,7 @@ class Converter(object):
                 os.rmdir(folder)
 
             clean_conversion_folder(self.conversion_dir)
-            next_file = filehandler.get_next_file()
+            next_file = self.file_path_strategy.get_next()
 
         # Write docIndex to file
         indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')

@@ -1,7 +1,7 @@
 import hashlib
 
 from siarddk.xml import *
-from tiff.filehandler import LocalFileHandler
+from tiff.filehandler import LocalFilePathStrategy
 
 
 class FileIndex(IndexHandler):
@@ -42,11 +42,11 @@ class FileIndex(IndexHandler):
     def add_folders(self, folders: list):
         for folder in folders:
             logger.info('Adding %s to fileIndex.xml...' % folder)
-            filehandler = LocalFileHandler(folder)
-            next_file = filehandler.get_next_file()
+            filehandler = LocalFilePathStrategy(folder)
+            next_file = filehandler.get_next()
             while next_file:
                 self.add_file(next_file)
-                next_file = filehandler.get_next_file()
+                next_file = filehandler.get_next()
             logger.info('Added %s to fileIndex.xml' % folder)
 
     def remove_all(self):

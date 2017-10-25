@@ -1,26 +1,26 @@
 import os
 
 
-class FileHandler(object):
+class FilePathStrategy(object):
 
-    def get_next_file(self):
+    def get_next(self):
         pass
 
 
-class LocalFileHandler(FileHandler):
+class LocalFilePathStrategy(FilePathStrategy):
 
     def __init__(self, basedir):
         self.walk = os.walk(basedir)
         self.root, self.dirs, self.files = next(self.walk)
 
-    def get_next_file(self) -> os.path:
+    def get_next(self) -> os.path:
         if self.files:
             filename = self.files.pop(0)
             return os.path.join(self.root, filename)
         else:
             try:
                 self.root, self.dirs, self.files = next(self.walk)
-                return self.get_next_file()
+                return self.get_next()
             except StopIteration:
                 return None
 
