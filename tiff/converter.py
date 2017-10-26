@@ -46,6 +46,7 @@ class ComplexConverter(object):
 
 
 class Converter(object):
+    # TODO: use abstract factory to provide all the strategies
     def __init__(
             self,
             source: os.path.abspath,
@@ -53,7 +54,8 @@ class Converter(object):
             conversion_dir: os.path.abspath,
             name: str,
             settings: dict,
-            file_path_strategy: tiff.filehandler.FilePathStrategy
+            file_path_strategy,
+            initialization_strategy,
     ):
         self.source = source
         self.target = target
@@ -61,6 +63,7 @@ class Converter(object):
         self.name = name
         self.settings = settings
         self.file_path_strategy = file_path_strategy
+        self.initialization_strategy = initialization_strategy
 
         self.complex_converter = ComplexConverter(conversion_dir)
         self.docindex_handler = DocIndexHandler()
@@ -87,9 +90,7 @@ class Converter(object):
         logger.info('Conversion done!')
 
     def _new_target_run(self):
-        create_target_folder(self.target)  # only if in-place, move this to folder strategy
-
-        # Make folder strategy in folders.py
+        self.initialization_strategy.prepare(self)
 
         if self.settings['append']:
             self.docindex_handler = DocIndexHandler(
@@ -97,7 +98,6 @@ class Converter(object):
                              'docIndex.xml'))
             mID, dCf, dID = self.docindex_handler.get_ids()
         else:
-            rename_old_av_folders(self.target, self.name)  # move this to folder strategy
             mID, dCf, dID = (1, 1, 1)
 
         self.docmanager.set_location(mID, dCf, dID)

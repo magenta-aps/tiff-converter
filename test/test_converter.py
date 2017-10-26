@@ -9,6 +9,7 @@ import freezegun
 from tiff.converter import Converter, ComplexConverter
 from siarddk.docindex import DocIndexHandler
 from tiff.filehandler import LocalFilePathStrategy
+from ff.folder import LocalInitializationStrategy
 
 
 @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
@@ -136,7 +137,8 @@ class TestConverter(unittest.TestCase):
         self.converter = Converter(self.source, self.target,
                                    self.conversion_dir, 'AVID.MAG.1000',
                                    self.settings,
-                                   LocalFilePathStrategy(self.source))
+                                   LocalFilePathStrategy(self.source),
+                                   LocalInitializationStrategy())
 
     def tearDown(self):
         if os.path.isdir(self.target):
@@ -158,8 +160,14 @@ class TestConverter(unittest.TestCase):
 
     def test_should_store_filepathstrategy_in_attribute(self):
         self.assertEqual(
-            'FilePathStrategy',
-            self.converter.file_path_strategy.__class__.__bases__[0].__name__)
+            'LocalFilePathStrategy',
+            self.converter.file_path_strategy.__class__.__name__)
+        self.converter.close()
+
+    def test_should_store_initializationstrategy_in_attribute(self):
+        self.assertEqual(
+            'LocalInitializationStrategy',
+            self.converter.initialization_strategy.__class__.__name__)
         self.converter.close()
 
     def test_should_create_folders_AVID_MAG_1000_1_and_Document(self):
@@ -201,7 +209,8 @@ class TestConverter(unittest.TestCase):
     def test_should_create_folder_AVID_XYZ_2000_1(self):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.XYZ.2000',
-                              self.settings, LocalFilePathStrategy(self.source))
+                              self.settings, LocalFilePathStrategy(self.source),
+                              LocalInitializationStrategy())
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(
@@ -280,7 +289,8 @@ class TestConverter(unittest.TestCase):
         self.source = os.path.abspath('test/resources/root2')
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              self.settings, LocalFilePathStrategy(self.source))
+                              self.settings, LocalFilePathStrategy(self.source),
+                              LocalInitializationStrategy())
         converter.run()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -290,7 +300,8 @@ class TestConverter(unittest.TestCase):
         open(os.path.join(self.conversion_dir, 'file.empty'), 'w').close()
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              self.settings, LocalFilePathStrategy(self.source))
+                              self.settings, LocalFilePathStrategy(self.source),
+                              LocalInitializationStrategy())
         converter.close()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -327,7 +338,8 @@ class TestConverter(unittest.TestCase):
         self.source = os.path.abspath('test/resources/root3')
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              self.settings, LocalFilePathStrategy(self.source))
+                              self.settings, LocalFilePathStrategy(self.source),
+                              LocalInitializationStrategy())
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(self.target))
@@ -339,7 +351,8 @@ class TestConverter(unittest.TestCase):
         self.source = os.path.abspath('test/resources/root2')
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
-                              self.settings, LocalFilePathStrategy(self.source))
+                              self.settings, LocalFilePathStrategy(self.source),
+                              LocalInitializationStrategy())
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(
@@ -362,7 +375,8 @@ class TestConverterAppend(unittest.TestCase):
             shutil.rmtree(target)
         conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
         converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
-                              settings, LocalFilePathStrategy(source))
+                              settings, LocalFilePathStrategy(source),
+                              LocalInitializationStrategy())
         converter.run()
 
         # Add new file to the existing AV
@@ -370,7 +384,8 @@ class TestConverterAppend(unittest.TestCase):
         settings['append'] = True
         source = os.path.abspath('test/resources/root3')
         converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
-                              settings)
+                              settings, LocalFilePathStrategy(source),
+                              LocalInitializationStrategy())
         converter.run()
 
         # Check that the tiffs exist
@@ -448,7 +463,8 @@ class TestSourceEqualsTargetConversion(unittest.TestCase):
         self.converter = Converter(self.source, None,
                                    self.conversion_dir, 'AVID.MAG.1000',
                                    self.settings,
-                                   LocalFilePathStrategy(self.source))
+                                   LocalFilePathStrategy(self.source),
+                                   LocalInitializationStrategy())
 
     def tearDown(self):
         if os.path.isdir(self.folder):

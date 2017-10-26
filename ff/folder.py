@@ -42,3 +42,12 @@ def rename_old_av_folders(target: os.path.abspath, name: str):
                 target, '%s_%s' % (
                 f, datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')))
             os.rename(os.path.join(target, f), new_name)
+
+
+class LocalInitializationStrategy(object):
+    @staticmethod
+    def prepare(converter):
+        create_target_folder(converter.target)
+        if not converter.settings['append']:
+            rename_old_av_folders(converter.target, converter.name)
+
