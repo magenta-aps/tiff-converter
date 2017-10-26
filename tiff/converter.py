@@ -103,7 +103,7 @@ class Converter(object):
         self.docmanager.set_location(mID, dCf, dID)
 
         success = True
-        next_file = self.file_path_strategy.get_next()
+        next_file = self.file_path_strategy.get_next()[0]
         while next_file:
             if success:
                 mID, dCf, dID = self.docmanager.get_location()
@@ -121,7 +121,7 @@ class Converter(object):
                 os.rmdir(folder)
 
             clean_conversion_folder(self.conversion_dir)
-            next_file = self.file_path_strategy.get_next()
+            next_file = self.file_path_strategy.get_next()[0]
 
         # Write docIndex to file
         indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
