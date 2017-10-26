@@ -35,10 +35,15 @@ class TiffConverter(object):
     @staticmethod
     def image_magick_convert(infile: os.path.abspath,
                              tiff: os.path.abspath) -> bool:
+        tiff_dir = os.path.split(tiff)[0]
+        if not os.path.isdir(tiff_dir):
+            os.makedirs(tiff_dir)
         subprocess.call('convert ' + infile + ' -compress lzw ' + tiff,
                         shell=True)
         if os.path.isfile(tiff):
             logger.info('Successfully converted %s to TIFF' % infile)
             return True
         else:
+            if len(os.listdir(tiff_dir)) == 0:
+                os.rmdir(tiff_dir)
             return False
