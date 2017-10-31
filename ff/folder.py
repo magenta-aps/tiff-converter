@@ -18,15 +18,13 @@ def create_conversion_folder(folder: os.path.abspath):
     os.makedirs(folder)
 
 
+# TODO: rename method... create_tiff_path
 def create_doc_folder(target: os.path.abspath, name: str, mID: int, dCf: int,
                       dID: int):
-    folder = os.path.join(target, '%s.%s' % (name, mID),
-                          'Documents', 'docCollection%s' % dCf, str(dID)
-                          )
-    if not os.path.isdir(folder):
-        os.makedirs(folder)
-
-    return folder
+    tiff_path = os.path.join(target, '%s.%s' % (name, mID),
+                          'Documents', 'docCollection%s' % dCf, str(dID),
+                          '1.tif')
+    return tiff_path
 
 
 def create_target_folder(target: os.path.abspath):
@@ -40,7 +38,7 @@ def rename_old_av_folders(target: os.path.abspath, name: str):
         if name in f:
             new_name = os.path.join(
                 target, '%s_%s' % (
-                f, datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')))
+                    f, datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')))
             os.rename(os.path.join(target, f), new_name)
 
 
@@ -50,4 +48,3 @@ class LocalInitializationStrategy(object):
         create_target_folder(converter.target)
         if not converter.settings['append']:
             rename_old_av_folders(converter.target, converter.name)
-

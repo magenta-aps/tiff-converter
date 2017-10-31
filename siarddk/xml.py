@@ -20,11 +20,18 @@ class IndexHandler(object):
         'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
     }
 
-    def __init__(self, path: os.path.abspath):
+    def __init__(self, target: os.path.abspath, name: str):
         """
-        :param path: Full path to index file
+        :param target: the target folder where the archival version is located
+        :param name: the name of the archival version, e.g. AVID.MAG.1000
         """
-        if path:
+
+        self.target = target
+        self.name = name
+        path = os.path.join(target, '%s.1' % name, 'Indices',
+                            '%s.xml' % self.NAME)
+
+        if os.path.isfile(path):
             with open(path, 'r') as f:
                 self.index = etree.parse(f).getroot()
             # index_type = os.path.splitext(os.path.basename(path))[0]
@@ -58,7 +65,7 @@ class IndexHandler(object):
         return str(etree.tostring(index), 'utf-8') \
             if index is not None else None
 
-    def write(self, indices_path: os.path.abspath):
+    def write(self):
         """
         Validate the index file and write it to disk
         """
@@ -67,6 +74,8 @@ class IndexHandler(object):
 
         index_str = self.to_string()
         if index_str:
+            indices_path = os.path.join(self.target, '%s.1' % self.name,
+                                      'Indices')
             if not os.path.isdir(indices_path):
                 os.makedirs(indices_path)
             index_path = os.path.join(indices_path, '%s.xml' % self.NAME)

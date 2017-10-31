@@ -8,8 +8,13 @@ from siarddk.fileindex import FileIndex
 
 class TestFileIndexReader(unittest.TestCase):
     def setUp(self):
-        self.fileindex = FileIndex(os.path.abspath('test/resources/siarddk'),
-                                   'AVID.MAG.1000')
+        self.target = os.path.join(tempfile.gettempdir(), '_fileindex')
+        shutil.copytree('test/resources/siarddk', self.target)
+        self.fileindex = FileIndex(self.target, 'AVID.MAG.1000')
+
+    def tearDown(self):
+        if os.path.isdir(self.target):
+            shutil.rmtree(self.target)
 
     def test_should_read_1st_file(self):
         index = self.fileindex.get_index()
@@ -31,8 +36,8 @@ class TestFileIndexReader(unittest.TestCase):
 
     def test_should_add_sample_tif_to_index(self):
         self.fileindex.add_file(os.path.abspath(
-            'test/resources/siarddk/AVID.MAG.1000.1/'
-            'Documents/docCollection1/1/1.tif'))
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif')))
         index = self.fileindex.get_index()
         self.assertEqual(8, len(index))
         f = index[-1]
@@ -43,8 +48,8 @@ class TestFileIndexReader(unittest.TestCase):
 
     def test_should_add_sample2_tif_to_index(self):
         self.fileindex.add_file(os.path.abspath(
-            'test/resources/siarddk/AVID.MAG.1000.1/'
-            'Documents/docCollection1/2/1.tif'))
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '2', '1.tif')))
         index = self.fileindex.get_index()
         self.assertEqual(8, len(index))
         f = index[-1]
@@ -56,7 +61,8 @@ class TestFileIndexReader(unittest.TestCase):
     def test_should_not_add_fileindex_xml(self):
         self.assertEqual(7, len(self.fileindex.get_index()))
         self.fileindex.add_file(os.path.abspath(
-            'test/resources/siarddk/AVID.MAG.1000.1/Indices/fileIndex.xml'))
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Indices',
+                         'fileIndex.xml')))
         self.assertEqual(7, len(self.fileindex.get_index()))
 
     def test_should_remove_all_non_table_files(self):
@@ -70,7 +76,7 @@ class TestFileIndexReader(unittest.TestCase):
         self.fileindex.remove_all()
         self.assertEqual(4, len(self.fileindex.get_index()))
         self.fileindex.add_folders(
-            [os.path.abspath('test/resources/siarddk/AVID.MAG.1000.1')])
+            [os.path.join(self.target, 'AVID.MAG.1000.1')])
         index = self.fileindex.get_index()
         self.assertEqual(6, len(index))
         doc1 = index[-2]
@@ -87,11 +93,10 @@ class TestFileIndexReader(unittest.TestCase):
         self.assertTrue(self.fileindex.is_valid())
 
     def test_should_write_fileindex_to_disk(self):
-        target = os.path.join(tempfile.gettempdir(), '_fileindex')
-        indices_path = os.path.join(target, 'AVID.MAG.1000.1', 'Indices')
-        self.fileindex.write(indices_path)
-
-        self.assertTrue(
-            os.path.isfile(os.path.join(indices_path, 'fileIndex.xml')))
-
-        shutil.rmtree(target)
+        fileindex_path = os.path.join(self.target, 'AVID.MAG.1000.1', 'Indices',
+                                      'fileIndex.xml')
+        os.remove(fileindex_path)
+        self.fileindex.write()
+        self.assertTrue(os.path.isfile(fileindex_path))
+        fileindex = FileIndex(self.target, 'AVID.MAG.1000')
+        self.assertTrue(fileindex.is_valid())

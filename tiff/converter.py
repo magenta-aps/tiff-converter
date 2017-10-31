@@ -1,10 +1,7 @@
-import siarddk.docmanager
-import siarddk.docindex
 import tiff.filehandler
 from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
 from ff.folder import *
-from siarddk.docindex import DocIndexHandler
 
 from util.logger import logger
 
@@ -56,6 +53,7 @@ class Converter(object):
             settings: dict,
             file_path_strategy,
             initialization_strategy,
+            docindex_handler
     ):
         self.source = source
         self.target = target
@@ -64,11 +62,9 @@ class Converter(object):
         self.settings = settings
         self.file_path_strategy = file_path_strategy
         self.initialization_strategy = initialization_strategy
+        self.docindex_handler = docindex_handler
 
         self.complex_converter = ComplexConverter(conversion_dir)
-        self.docindex_handler = DocIndexHandler()
-        self.docmanager = siarddk.docmanager.LocalDocumentManager(
-            self.settings['append'])
 
         create_conversion_folder(conversion_dir)
         clean_conversion_folder(conversion_dir)
@@ -81,72 +77,43 @@ class Converter(object):
     def run(self):
         logger.info('Starting conversion...')
 
-        if self.settings['in-place']:
-            self._reuse_source_as_target_run()
-        else:
-            self._new_target_run()
-
-        self.close()
-        logger.info('Conversion done!')
-
-    def _new_target_run(self):
         self.initialization_strategy.prepare(self)
 
-        if self.settings['append']:
-            self.docindex_handler = DocIndexHandler(
-                os.path.join(self.target, '%s.1' % self.name, 'Indices',
-                             'docIndex.xml'))
-            mID, dCf, dID = self.docindex_handler.get_ids()
-        else:
-            mID, dCf, dID = (1, 1, 1)
-
-        self.docmanager.set_location(mID, dCf, dID)
-
-        success = True
-        next_file = self.file_path_strategy.get_next()[0]
+        next_file, tiff_path = self.file_path_strategy.get_next(self)
         while next_file:
-            if success:
-                mID, dCf, dID = self.docmanager.get_location()
-
-            folder = create_doc_folder(self.target, self.name, mID, dCf, dID)
-
             # Convert file to TIFF
-            success = self.complex_converter.convert(
-                next_file, os.path.join(folder, '1.tif'))
+            success = self.complex_converter.convert(next_file, tiff_path)
             if success:
-                oFn = os.path.basename(next_file)
-                self.docindex_handler.add_doc(str(mID), 'docCollection%s' % dCf,
-                                              str(dID), oFn, 'tif')
-            else:
-                os.rmdir(folder)
+                self.docindex_handler.add_file(next_file, tiff_path)
 
             clean_conversion_folder(self.conversion_dir)
-            next_file = self.file_path_strategy.get_next()[0]
+            next_file, tiff_path = self.file_path_strategy.get_next(self)
 
-        # Write docIndex to file
-        indices_path = os.path.join(self.target, '%s.1' % self.name, 'Indices')
-        self.docindex_handler.write(indices_path)
+        self.docindex_handler.write()
+        self.close()
 
-    def _reuse_source_as_target_run(self):
+        logger.info('Conversion done!')
 
-        # The source must be the folder where the AVID.XYZ.nnnn.m's are located
-
-        self.docindex_handler = DocIndexHandler(
-            os.path.join(self.source, '%s.1' % self.name, 'Indices',
-                         'docIndex.xml'))
-        docindex = self.docindex_handler.get_index()
-
-        for doc in docindex:
-            dID = doc[0].text
-            mID = doc[1].text
-            dCf = doc[2].text
-            path = os.path.join(self.source, '%s.%s' % (self.name, mID),
-                                'Documents', dCf, dID)
-            source_file = os.path.join(path, os.listdir(path)[0])
-
-            success = self.complex_converter.convert(
-                source_file, os.path.join(path, '1.tif'))
-            if success:
-                os.remove(source_file)
-
-            clean_conversion_folder(self.conversion_dir)
+    # def _reuse_source_as_target_run(self):
+    #
+    #     # The source must be the folder where the AVID.XYZ.nnnn.m's are located
+    #
+    #     self.docindex_handler = DocIndexHandler(
+    #         os.path.join(self.source, '%s.1' % self.name, 'Indices',
+    #                      'docIndex.xml'))
+    #     docindex = self.docindex_handler.get_index()
+    #
+    #     for doc in docindex:
+    #         dID = doc[0].text
+    #         mID = doc[1].text
+    #         dCf = doc[2].text
+    #         path = os.path.join(self.source, '%s.%s' % (self.name, mID),
+    #                             'Documents', dCf, dID)
+    #         source_file = os.path.join(path, os.listdir(path)[0])
+    #
+    #         success = self.complex_converter.convert(
+    #             source_file, os.path.join(path, '1.tif'))
+    #         if success:
+    #             os.remove(source_file)
+    #
+    #         clean_conversion_folder(self.conversion_dir)

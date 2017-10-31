@@ -131,14 +131,17 @@ class TestConverter(unittest.TestCase):
         }
         self.source = os.path.abspath('test/resources/root')
         self.target = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
+        self.name = 'AVID.MAG.1000'
         if os.path.isdir(self.target):
             shutil.rmtree(self.target)
         self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
         self.converter = Converter(self.source, self.target,
-                                   self.conversion_dir, 'AVID.MAG.1000',
+                                   self.conversion_dir,
+                                   self.name,
                                    self.settings,
                                    LocalFilePathStrategy(self.source),
-                                   LocalInitializationStrategy())
+                                   LocalInitializationStrategy(),
+                                   DocIndexHandler(self.target, self.name))
 
     def tearDown(self):
         if os.path.isdir(self.target):
@@ -176,7 +179,8 @@ class TestConverter(unittest.TestCase):
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents')))
 
     def test_should_create_folder_AVID_MAG_1000_2_and_Documents(self):
-        self.converter.docmanager.MAX = 2
+        # self.converter.docmanager.MAX = 2
+        self.converter.docindex_handler.docmanager.MAX = 2
         self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents')))
@@ -188,7 +192,8 @@ class TestConverter(unittest.TestCase):
                          'docCollection1')))
 
     def test_folder_docCollection2_should_exists_after_file_conversion2(self):
-        self.converter.docmanager.MAX = 2
+        # self.converter.docmanager.MAX = 2
+        self.converter.docindex_handler.docmanager.MAX = 2
         self.converter.run()
         self.assertTrue(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
@@ -210,7 +215,8 @@ class TestConverter(unittest.TestCase):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.XYZ.2000',
                               self.settings, LocalFilePathStrategy(self.source),
-                              LocalInitializationStrategy())
+                              LocalInitializationStrategy(),
+                              DocIndexHandler(self.target, 'AVID.XYZ.2000'))
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(
@@ -227,19 +233,19 @@ class TestConverter(unittest.TestCase):
                          '2', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '3', '1.tif')))
+                         'docCollection1', '4', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '4', '1.tif')))
+                         'docCollection1', '5', '1.tif')))
         self.assertFalse(os.path.isdir(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '5')))
+                         'docCollection1', '6')))
         self.assertFalse(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '5', '1.tif')))
+                         'docCollection1', '6', '1.tif')))
 
     def test_should_convert_root_folder_correctly_when_MAX_2(self):
-        self.converter.docmanager.MAX = 2
+        self.converter.docindex_handler.docmanager.MAX = 2
         self.converter.run()
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
@@ -250,16 +256,16 @@ class TestConverter(unittest.TestCase):
                          '2', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection2', '3', '1.tif')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection2', '4', '1.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection3', '5', '1.tif')))
         self.assertFalse(os.path.isfile(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection3', '5', '1.tif')))
+                         'docCollection3', '6', '1.tif')))
+        self.assertFalse(os.path.isfile(
+            os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection3', '6', '1.tif')))
 
     @mock.patch('tiff.tiffconverter.TiffConverter.pdf_convert')
     def test_pdf_conversion_succeeds_tiff_conversion_fails(self, mock_convert):
@@ -279,7 +285,7 @@ class TestConverter(unittest.TestCase):
         self.assertEqual('sample1.docx', doc1[3].text)
         self.assertEqual('tif', doc1[4].text)
 
-        self.assertEqual('2', doc2[0].text)
+        self.assertEqual('4', doc2[0].text)
         self.assertEqual('1', doc2[1].text)
         self.assertEqual('docCollection1', doc2[2].text)
         self.assertEqual('sample1.docx', doc2[3].text)
@@ -290,7 +296,8 @@ class TestConverter(unittest.TestCase):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
                               self.settings, LocalFilePathStrategy(self.source),
-                              LocalInitializationStrategy())
+                              LocalInitializationStrategy(),
+                              DocIndexHandler(self.target, 'AVID.MAG.1000'))
         converter.run()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -301,7 +308,8 @@ class TestConverter(unittest.TestCase):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
                               self.settings, LocalFilePathStrategy(self.source),
-                              LocalInitializationStrategy())
+                              LocalInitializationStrategy(),
+                              DocIndexHandler('', ''))
         converter.close()
         self.converter.close()
         self.assertEqual([], os.listdir(self.conversion_dir))
@@ -316,10 +324,10 @@ class TestConverter(unittest.TestCase):
                    '<oFn>sample1.docx</oFn>' \
                    '<aFt>tif</aFt></doc><doc><dID>2</dID><mID>1</mID>' \
                    '<dCf>docCollection1</dCf><oFn>sample2.docx</oFn>' \
-                   '<aFt>tif</aFt></doc><doc><dID>3</dID>' \
+                   '<aFt>tif</aFt></doc><doc><dID>4</dID>' \
                    '<mID>1</mID><dCf>docCollection1</dCf>' \
                    '<oFn>sample1.docx</oFn>' \
-                   '<aFt>tif</aFt></doc><doc><dID>4</dID><mID>1</mID>' \
+                   '<aFt>tif</aFt></doc><doc><dID>5</dID><mID>1</mID>' \
                    '<dCf>docCollection1</dCf><oFn>sample2.docx</oFn>' \
                    '<aFt>tif</aFt></doc></docIndex>'
         docIndex = os.path.join(self.target, 'AVID.MAG.1000.1', 'Indices',
@@ -339,7 +347,8 @@ class TestConverter(unittest.TestCase):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
                               self.settings, LocalFilePathStrategy(self.source),
-                              LocalInitializationStrategy())
+                              LocalInitializationStrategy(),
+                              DocIndexHandler(self.target, 'AVID.MAG.1000'))
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(self.target))
@@ -352,7 +361,8 @@ class TestConverter(unittest.TestCase):
         converter = Converter(self.source, self.target,
                               self.conversion_dir, 'AVID.MAG.1000',
                               self.settings, LocalFilePathStrategy(self.source),
-                              LocalInitializationStrategy())
+                              LocalInitializationStrategy(),
+                              DocIndexHandler(self.target, 'AVID.MAG.1000'))
         converter.run()
         self.converter.close()
         self.assertTrue(os.path.isdir(
@@ -371,21 +381,30 @@ class TestConverterAppend(unittest.TestCase):
         }
         source = os.path.abspath('test/resources/root')
         target = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
+        name = 'AVID.MAG.1000'
         if os.path.isdir(target):
             shutil.rmtree(target)
         conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
-        converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
-                              settings, LocalFilePathStrategy(source),
-                              LocalInitializationStrategy())
+        converter = Converter(source, target, conversion_dir,
+                              name,
+                              settings,
+                              LocalFilePathStrategy(source),
+                              LocalInitializationStrategy(),
+                              DocIndexHandler(target, name))
+
         converter.run()
 
         # Add new file to the existing AV
 
         settings['append'] = True
         source = os.path.abspath('test/resources/root3')
-        converter = Converter(source, target, conversion_dir, 'AVID.MAG.1000',
-                              settings, LocalFilePathStrategy(source),
-                              LocalInitializationStrategy())
+        converter = Converter(source, target, conversion_dir,
+                              name,
+                              settings,
+                              LocalFilePathStrategy(source),
+                              LocalInitializationStrategy(),
+                              DocIndexHandler(target, name))
+
         converter.run()
 
         # Check that the tiffs exist
@@ -399,31 +418,51 @@ class TestConverterAppend(unittest.TestCase):
                          '2', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '3', '1.tif')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '4', '1.tif')))
         self.assertTrue(os.path.isfile(
             os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '5', '1.tif')))
+        self.assertTrue(os.path.isfile(
+            os.path.join(target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '6', '1.tif')))
 
         # Check docIndex.xml
 
-        docindex_handler = DocIndexHandler(
-            os.path.join(target, 'AVID.MAG.1000.1', 'Indices', 'docIndex.xml'))
+        docindex_handler = DocIndexHandler(target, name)
         docindex = docindex_handler.get_index()
 
         self.assertEqual(5, len(docindex))
-        for i in range(1, 5):
-            doc = docindex[i - 1]
-            self.assertEqual(str(i), doc[0].text)
-            self.assertEqual('1', doc[1].text)
-            self.assertEqual('docCollection1', doc[2].text)
-            self.assertEqual('sample%s.docx' % (1 if i % 2 == 1 else 2),
-                             doc[3].text)
-            self.assertEqual('tif', doc[4].text)
-        doc = docindex[4]
+
+        doc = docindex[0]
+        self.assertEqual('1', doc[0].text)
+        self.assertEqual('1', doc[1].text)
+        self.assertEqual('docCollection1', doc[2].text)
+        self.assertEqual('sample1.docx', doc[3].text)
+        self.assertEqual('tif', doc[4].text)
+
+        doc = docindex[1]
+        self.assertEqual('2', doc[0].text)
+        self.assertEqual('1', doc[1].text)
+        self.assertEqual('docCollection1', doc[2].text)
+        self.assertEqual('sample2.docx', doc[3].text)
+        self.assertEqual('tif', doc[4].text)
+
+        doc = docindex[2]
+        self.assertEqual('4', doc[0].text)
+        self.assertEqual('1', doc[1].text)
+        self.assertEqual('docCollection1', doc[2].text)
+        self.assertEqual('sample1.docx', doc[3].text)
+        self.assertEqual('tif', doc[4].text)
+
+        doc = docindex[3]
         self.assertEqual('5', doc[0].text)
+        self.assertEqual('1', doc[1].text)
+        self.assertEqual('docCollection1', doc[2].text)
+        self.assertEqual('sample2.docx', doc[3].text)
+        self.assertEqual('tif', doc[4].text)
+
+        doc = docindex[4]
+        self.assertEqual('6', doc[0].text)
         self.assertEqual('1', doc[1].text)
         self.assertEqual('docCollection1', doc[2].text)
         self.assertEqual('spreadsheet1.xlsx', doc[3].text)
@@ -435,99 +474,103 @@ class TestConverterAppend(unittest.TestCase):
             shutil.rmtree(conversion_dir)
 
 
-@unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
-class TestSourceEqualsTargetConversion(unittest.TestCase):
-    """
-    Testing in-place conversion
-    """
-
-    def setUp(self):
-        self.settings = {
-            'tiff': {
-                'resolution': '150'
-            },
-            'append': False,
-            'in-place': True
-        }
-        self.folder = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
-        if os.path.isdir(self.folder):
-            shutil.rmtree(self.folder)
-        self.source = self.folder
-        shutil.copytree(
-            os.path.abspath('test/resources/siarddk2/AVID.MAG.1000.1/'),
-            os.path.join(self.folder, 'AVID.MAG.1000.1'))
-        shutil.copytree(
-            os.path.abspath('test/resources/siarddk2/AVID.MAG.1000.2/'),
-            os.path.join(self.folder, 'AVID.MAG.1000.2'))
-        self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
-        self.converter = Converter(self.source, None,
-                                   self.conversion_dir, 'AVID.MAG.1000',
-                                   self.settings,
-                                   LocalFilePathStrategy(self.source),
-                                   LocalInitializationStrategy())
-
-    def tearDown(self):
-        if os.path.isdir(self.folder):
-            shutil.rmtree(self.folder)
-        if os.path.isdir(self.conversion_dir):
-            shutil.rmtree(self.conversion_dir)
-
-    def test_sample_tif_should_exist_after_conversion(self):
-        self.converter.run()
-
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '1', '1.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '1', 'sample.doc')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '2', '1.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '2', 'sample.doc')))
-
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '3', '1.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '3', 'sample.doc')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '4', '1.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '4', 'sample.doc')))
-
-    @mock.patch('tiff.pdfconverter.MSOfficeToPdfConverter.convert')
-    def test_should_not_remove_sample_doc_when_conversion_fails(self, mock):
-        mock.return_value = None
-        self.converter.run()
-
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '1', '1.tif')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '1', 'sample.doc')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '2', '1.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
-                         'docCollection1', '2', 'sample.doc')))
-
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '3', '1.tif')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '3', 'sample.doc')))
-        self.assertTrue(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '4', '1.tif')))
-        self.assertFalse(os.path.isfile(
-            os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
-                         'docCollection2', '4', 'sample.doc')))
+# @unittest.skipIf(platform.system() == 'Linux', 'Since MS Word is Windows only')
+# class TestSourceEqualsTargetConversion(unittest.TestCase):
+#     """
+#     Testing in-place conversion
+#     """
+#
+#     def setUp(self):
+#         self.settings = {
+#             'tiff': {
+#                 'resolution': '150'
+#             },
+#             'append': False,
+#             'in-place': True
+#         }
+#         self.folder = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
+#         if os.path.isdir(self.folder):
+#             shutil.rmtree(self.folder)
+#         self.source = self.folder
+#
+#         # TODO: clean this up a bit...
+#         shutil.copytree(
+#             os.path.abspath('test/resources/siarddk2/AVID.MAG.1000.1/'),
+#             os.path.join(self.folder, 'AVID.MAG.1000.1'))
+#         shutil.copytree(
+#             os.path.abspath('test/resources/siarddk2/AVID.MAG.1000.2/'),
+#             os.path.join(self.folder, 'AVID.MAG.1000.2'))
+#
+#         self.conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
+#         self.converter = Converter(self.source, self.folder,
+#                                    self.conversion_dir, 'AVID.MAG.1000',
+#                                    self.settings,
+#                                    LocalFilePathStrategy(self.source),
+#                                    LocalInitializationStrategy(),
+#                                    DocIndexHandler(self.folder, 'AVID.MAG.1000'))
+#
+#     def tearDown(self):
+#         if os.path.isdir(self.folder):
+#             shutil.rmtree(self.folder)
+#         if os.path.isdir(self.conversion_dir):
+#             shutil.rmtree(self.conversion_dir)
+#
+#     def test_sample_tif_should_exist_after_conversion(self):
+#         self.converter.run()
+#
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '1', '1.tif')))
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '1', 'sample.doc')))
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '2', '1.tif')))
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '2', 'sample.doc')))
+#
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '3', '1.tif')))
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '3', 'sample.doc')))
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '4', '1.tif')))
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '4', 'sample.doc')))
+#
+#     @mock.patch('tiff.pdfconverter.MSOfficeToPdfConverter.convert')
+#     def test_should_not_remove_sample_doc_when_conversion_fails(self, mock):
+#         mock.return_value = None
+#         self.converter.run()
+#
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '1', '1.tif')))
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '1', 'sample.doc')))
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '2', '1.tif')))
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.1', 'Documents',
+#                          'docCollection1', '2', 'sample.doc')))
+#
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '3', '1.tif')))
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '3', 'sample.doc')))
+#         self.assertTrue(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '4', '1.tif')))
+#         self.assertFalse(os.path.isfile(
+#             os.path.join(self.folder, 'AVID.MAG.1000.2', 'Documents',
+#                          'docCollection2', '4', 'sample.doc')))

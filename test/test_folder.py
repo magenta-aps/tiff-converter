@@ -18,21 +18,16 @@ class TestFolder(unittest.TestCase):
             shutil.rmtree(self.target)
 
     def test_should_create_AVID_MAG_1000_1_1_1(self):
-        create_doc_folder(self.target, 'AVID.MAG.1000', 1, 1, 1)
-        self.assertTrue(
-            os.path.isdir(
-                os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
-                             'docCollection1', '1')))
+        self.assertEqual(
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif'),
+            create_doc_folder(self.target, 'AVID.MAG.1000', 1, 1, 1))
 
     def test_should_create_AVID_MAG_1000_3_2_5(self):
         folder = create_doc_folder(self.target, 'AVID.MAG.1000', 3, 2, 5)
-        self.assertTrue(
-            os.path.isdir(
-                os.path.join(self.target, 'AVID.MAG.1000.3', 'Documents',
-                             'docCollection2', '5')))
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.3', 'Documents',
-                         'docCollection2', '5'), folder)
+                         'docCollection2', '5', '1.tif'), folder)
 
     @freezegun.freeze_time('2017-01-01 12:00:00')
     def test_should_rename_AVID_MAG_1000_1(self):

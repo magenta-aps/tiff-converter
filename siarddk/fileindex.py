@@ -8,17 +8,6 @@ class FileIndex(IndexHandler):
     NS = 'http://www.sa.dk/xmlns/diark/1.0'
     NAME = 'fileIndex'
 
-    def __init__(self, target: os.path.abspath, name: str):
-        """
-        :param target: the target folder where the archival version is located
-        :param name: the name of the archival version, e.g. AVID.MAG.1000
-        """
-
-        path = os.path.join(target, '%s.1' % name, 'Indices', 'fileIndex.xml')
-
-        IndexHandler.__init__(self, path if os.path.isfile(path) else None)
-        self.target = target
-
     def add_file(self, path: os.path.abspath):
         logger.debug('Adding %s to fileIndex.xml...' % path)
 
