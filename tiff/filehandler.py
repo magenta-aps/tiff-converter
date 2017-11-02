@@ -17,7 +17,6 @@ class LocalFilePathStrategy(object):
     def get_next(self, converter) -> Tuple[os.path.abspath, os.path.abspath]:
         return self.get_source_path(), self._get_target_path(converter)
 
-    # TODO: rename this method (or something) as it is used by fileindex.py
     def get_source_path(self) -> os.path.abspath:
         if self.files:
             filename = self.files.pop(0)
@@ -36,22 +35,22 @@ class LocalFilePathStrategy(object):
 
 
 class InPlaceFilePathStrategy(object):
-
     def __init__(self, target, name):
-        self. target = target
+        self.target = target
         self.name = name
+        self.next_file = None
         self.folders = os.listdir(target)
         self.folders.sort()
         self.i = 0
         self._set_walker()
 
     def _get_source_path(self) -> os.path.abspath:
-        next_file = self.local_file_path_strategy.get_source_path()
-        if not next_file:
+        self.next_file = self.local_file_path_strategy.get_source_path()
+        if not self.next_file:
             self.i += 1
             self._set_walker()
-            next_file = self.local_file_path_strategy.get_source_path()
-        return next_file
+            self.next_file = self.local_file_path_strategy.get_source_path()
+        return self.next_file
 
     def _set_walker(self) -> os.path.abspath:
         if self.i < len(self.folders):
@@ -62,3 +61,7 @@ class InPlaceFilePathStrategy(object):
                 self.local_file_path_strategy = LocalFilePathStrategy(walk_path)
                 return walk_path
         return None
+
+    def _get_target_path(self):
+        return os.path.join(os.path.split(self.next_file)[0],
+                            '1.tif') if self.next_file else None

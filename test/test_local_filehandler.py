@@ -71,6 +71,8 @@ class TestInPlaceFilePathStrategy(unittest.TestCase):
         if os.path.isdir(self.target):
             shutil.rmtree(self.target)
 
+    # Testing _get_source_path
+
     def test_next_file_is_11_sample_doc(self):
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
@@ -121,6 +123,65 @@ class TestInPlaceFilePathStrategy(unittest.TestCase):
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection3', '6', 'sample.pdf'),
             self.file_path_strategy._get_source_path())
+
+    def test_next_file_is_none(self):
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.assertIsNone(self.file_path_strategy._get_source_path())
+
+    # Testing _get_target_path
+
+    def test_tiff_path_is_11_1_tif(self):
+        self.file_path_strategy._get_source_path()
+        self.assertEqual(
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif'),
+            self.file_path_strategy._get_target_path())
+
+    def test_tiff_path_is_12_1_tif(self):
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.assertEqual(
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '2', '1.tif'),
+            self.file_path_strategy._get_target_path())
+
+    def test_tiff_path_is_23_1_tif(self):
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.assertEqual(
+            os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '3', '1.tif'),
+            self.file_path_strategy._get_target_path())
+
+    def test_tiff_path_is_24_1_tif(self):
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.assertEqual(
+            os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
+                         'docCollection2', '4', '1.tif'),
+            self.file_path_strategy._get_target_path())
+
+    def test_tiff_path_is_none(self):
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.file_path_strategy._get_source_path()
+        self.assertIsNone(self.file_path_strategy._get_target_path())
+
+    # def next(self, n: int):
+    #     for i in range(n):
+    #         self.file_path_strategy._get_source_path()
 
 
 class TestSetWalker(unittest.TestCase):
