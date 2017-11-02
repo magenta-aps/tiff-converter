@@ -1,4 +1,6 @@
 import os
+import re
+import tempfile
 from typing import Tuple
 
 from ff.folder import create_doc_folder
@@ -7,20 +9,23 @@ from ff.folder import create_doc_folder
 class LocalFilePathStrategy(object):
     def __init__(self, basedir):
         self.walk = os.walk(basedir)
-        self.root, self.dirs, self.files = next(self.walk)
+        try:
+            self.root, self.dirs, self.files = next(self.walk)
+        except StopIteration:
+            pass
 
     def get_next(self, converter) -> Tuple[os.path.abspath, os.path.abspath]:
-        return self._get_source_path(), self._get_target_path(converter)
+        return self.get_source_path(), self._get_target_path(converter)
 
     # TODO: rename this method (or something) as it is used by fileindex.py
-    def _get_source_path(self) -> os.path.abspath:
+    def get_source_path(self) -> os.path.abspath:
         if self.files:
             filename = self.files.pop(0)
             return os.path.join(self.root, filename)
         else:
             try:
                 self.root, self.dirs, self.files = next(self.walk)
-                return self._get_source_path()
+                return self.get_source_path()
             except StopIteration:
                 return None
 
@@ -28,3 +33,32 @@ class LocalFilePathStrategy(object):
         mID, dCf, dID = converter.docindex_handler.get_location()
         return create_doc_folder(converter.target, converter.name, mID,
                                  dCf, dID)
+
+
+class InPlaceFilePathStrategy(object):
+
+    def __init__(self, target, name):
+        self. target = target
+        self.name = name
+        self.folders = os.listdir(target)
+        self.folders.sort()
+        self.i = 0
+        self._set_walker()
+
+    def _get_source_path(self) -> os.path.abspath:
+        next_file = self.local_file_path_strategy.get_source_path()
+        if not next_file:
+            self.i += 1
+            self._set_walker()
+            next_file = self.local_file_path_strategy.get_source_path()
+        return next_file
+
+    def _set_walker(self) -> os.path.abspath:
+        if self.i < len(self.folders):
+            folder = self.folders[self.i]
+            regex = re.compile(self.name + '\.[1-9][0-9]*$')
+            if regex.match(folder):
+                walk_path = os.path.join(self.target, folder, 'Documents')
+                self.local_file_path_strategy = LocalFilePathStrategy(walk_path)
+                return walk_path
+        return None

@@ -1,0 +1,30 @@
+<docIndex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sa.dk/xmlns/diark/1.0" xsi:schemaLocation="http://www.sa.dk/xmlns/diark/1.0 ../Schemas/standard/docIndex.xsd">
+    <doc>
+        <dID>1</dID>
+        <mID>1</mID>
+        <dCf>docCollection1</dCf>
+        <oFn>sample1.doc</oFn>
+        <aFt>tif</aFt>
+    </doc>
+    <doc>
+        <dID>2</dID>
+        <mID>1</mID>
+        <dCf>docCollection1</dCf>
+        <oFn>sample2.pdf</oFn>
+        <aFt>tif</aFt>
+    </doc>
+        <doc>
+        <dID>3</dID>
+        <mID>2</mID>
+        <dCf>docCollection2</dCf>
+        <oFn>sample1.doc</oFn>
+        <aFt>tif</aFt>
+    </doc>
+    <doc>
+        <dID>4</dID>
+        <mID>2</mID>
+        <dCf>docCollection2</dCf>
+        <oFn>sample2.pdf</oFn>
+        <aFt>tif</aFt>
+    </doc>
+</docIndex>

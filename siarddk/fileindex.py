@@ -32,10 +32,10 @@ class FileIndex(IndexHandler):
         for folder in folders:
             logger.info('Adding %s to fileIndex.xml...' % folder)
             filehandler = LocalFilePathStrategy(folder)
-            next_file = filehandler._get_source_path()
+            next_file = filehandler.get_source_path()
             while next_file:
                 self.add_file(next_file)
-                next_file = filehandler._get_source_path()
+                next_file = filehandler.get_source_path()
             logger.info('Added %s to fileIndex.xml' % folder)
 
     def remove_all(self):

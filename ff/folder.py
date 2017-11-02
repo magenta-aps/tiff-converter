@@ -48,3 +48,9 @@ class LocalInitializationStrategy(object):
         create_target_folder(converter.target)
         if not converter.settings['append']:
             rename_old_av_folders(converter.target, converter.name)
+
+
+class InPlaceInitializationStrategy(object):
+    @staticmethod
+    def prepare(converter):
+        pass
