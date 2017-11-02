@@ -87,50 +87,35 @@ class TestInPlaceFilePathStrategy(unittest.TestCase):
             self.file_path_strategy._get_source_path())
 
     def test_next_file_is_23_sample_doc(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(2)
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection2', '3', 'sample.doc'),
             self.file_path_strategy._get_source_path())
 
     def test_next_file_is_24_sample_pdf(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(3)
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection2', '4', 'sample.pdf'),
             self.file_path_strategy._get_source_path())
 
     def test_next_file_is_35_sample_pdf(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(4)
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection3', '5', 'sample.doc'),
             self.file_path_strategy._get_source_path())
 
     def test_next_file_is_36_sample_pdf(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(5)
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection3', '6', 'sample.pdf'),
             self.file_path_strategy._get_source_path())
 
     def test_next_file_is_none(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(6)
         self.assertIsNone(self.file_path_strategy._get_source_path())
 
     # Testing _get_target_path
@@ -143,45 +128,33 @@ class TestInPlaceFilePathStrategy(unittest.TestCase):
             self.file_path_strategy._get_target_path())
 
     def test_tiff_path_is_12_1_tif(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(2)
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
                          'docCollection1', '2', '1.tif'),
             self.file_path_strategy._get_target_path())
 
     def test_tiff_path_is_23_1_tif(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(3)
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection2', '3', '1.tif'),
             self.file_path_strategy._get_target_path())
 
     def test_tiff_path_is_24_1_tif(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(4)
         self.assertEqual(
             os.path.join(self.target, 'AVID.MAG.1000.2', 'Documents',
                          'docCollection2', '4', '1.tif'),
             self.file_path_strategy._get_target_path())
 
     def test_tiff_path_is_none(self):
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
-        self.file_path_strategy._get_source_path()
+        self.next(7)
         self.assertIsNone(self.file_path_strategy._get_target_path())
 
-    # def next(self, n: int):
-    #     for i in range(n):
-    #         self.file_path_strategy._get_source_path()
+    def next(self, n: int):
+        for i in range(n):
+            self.file_path_strategy._get_source_path()
 
 
 class TestSetWalker(unittest.TestCase):
