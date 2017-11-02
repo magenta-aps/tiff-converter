@@ -44,6 +44,9 @@ class InPlaceFilePathStrategy(object):
         self.i = 0
         self._set_walker()
 
+    def get_next(self, converter) -> Tuple[os.path.abspath, os.path.abspath]:
+        return self._get_source_path(), self._get_target_path()
+
     def _get_source_path(self) -> os.path.abspath:
         self.next_file = self.local_file_path_strategy.get_source_path()
         if not self.next_file:

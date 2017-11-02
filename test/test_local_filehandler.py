@@ -152,6 +152,16 @@ class TestInPlaceFilePathStrategy(unittest.TestCase):
         self.next(7)
         self.assertIsNone(self.file_path_strategy._get_target_path())
 
+    # Testing get_next
+
+    def test_get_next(self):
+        self.assertEqual((
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', 'sample.doc'),
+            os.path.join(self.target, 'AVID.MAG.1000.1', 'Documents',
+                         'docCollection1', '1', '1.tif')),
+            self.file_path_strategy.get_next(None))
+
     def next(self, n: int):
         for i in range(n):
             self.file_path_strategy._get_source_path()
