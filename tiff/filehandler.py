@@ -1,6 +1,5 @@
 import os
 import re
-import tempfile
 from typing import Tuple
 
 from ff.folder import create_doc_folder

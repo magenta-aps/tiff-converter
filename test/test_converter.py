@@ -357,9 +357,12 @@ class TestConverter(unittest.TestCase):
 
     def test_should_create_target_folder(self):
         self.source = os.path.abspath('test/resources/root3')
-        converter = Converter(self.source, self.target,
-                              self.conversion_dir, 'AVID.MAG.1000',
-                              self.settings, LocalFilePathStrategy(self.source),
+        converter = Converter(self.source,
+                              self.target,
+                              self.conversion_dir,
+                              'AVID.MAG.1000',
+                              self.settings,
+                              LocalFilePathStrategy(self.source),
                               LocalInitializationStrategy(),
                               DocIndexHandler(self.target, 'AVID.MAG.1000'),
                               LocalSuccessStrategy())
@@ -372,9 +375,12 @@ class TestConverter(unittest.TestCase):
         path_to_rename = os.path.join(self.target, 'AVID.MAG.1000.1')
         os.makedirs(path_to_rename)
         self.source = os.path.abspath('test/resources/root2')
-        converter = Converter(self.source, self.target,
-                              self.conversion_dir, 'AVID.MAG.1000',
-                              self.settings, LocalFilePathStrategy(self.source),
+        converter = Converter(self.source,
+                              self.target,
+                              self.conversion_dir,
+                              'AVID.MAG.1000',
+                              self.settings,
+                              LocalFilePathStrategy(self.source),
                               LocalInitializationStrategy(),
                               DocIndexHandler(self.target, 'AVID.MAG.1000'),
                               LocalSuccessStrategy())
@@ -394,16 +400,15 @@ class TestConverterAppend(unittest.TestCase):
             'append': False,
             'in-place': False
         }
-        # temp_source = os.path.join(tempfile.gettempdir(), '_src')
-        # shutil.copytree('test/resources/root', temp_source)
         source = os.path.abspath('test/resources/root')
-        # source = temp_source
         target = os.path.join(tempfile.gettempdir(), 'tiff-conversion')
         name = 'AVID.MAG.1000'
         if os.path.isdir(target):
             shutil.rmtree(target)
         conversion_dir = os.path.join(tempfile.gettempdir(), '_conversion')
-        converter = Converter(source, target, conversion_dir,
+        converter = Converter(source,
+                              target,
+                              conversion_dir,
                               name,
                               settings,
                               LocalFilePathStrategy(source),
