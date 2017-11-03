@@ -7,6 +7,13 @@ import click
 import tiff.converter
 from siarddk.fileindex import FileIndex
 from config import settings
+from tiff.filehandler import LocalFilePathStrategy
+from tiff.filehandler import InPlaceFilePathStrategy
+from ff.folder import LocalInitializationStrategy
+from ff.folder import InPlaceInitializationStrategy
+from siarddk.docindex import DocIndexHandler
+from tiff.success import LocalSuccessStrategy
+from tiff.success import LocalInPlaceSuccessStrategy
 
 
 @click.group()
@@ -44,16 +51,31 @@ def cli(ctx, target, name):
 @click.pass_context
 def convert(ctx, source, tempdir, append, inplace):
     if append and inplace:
-        click.echo('The --append and --in-place options cannot be used '
+        click.echo('The --append and --inplace options cannot be used '
                    'simultaneously')
         sys.exit()
 
     settings['append'] = append
     settings['in-place'] = inplace
 
+    source = os.path.abspath(source)
+    target = ctx.obj['target']
+    name = ctx.obj['name']
+
+    # TODO: in-place case missing...
     converter = tiff.converter.Converter(
-        os.path.abspath(source), ctx.obj['target'], tempdir, ctx.obj['name'],
-        settings)
+        source,
+        target,
+        tempdir,
+        name,
+        settings,
+        LocalFilePathStrategy(
+            source) if not inplace else InPlaceFilePathStrategy(source, name),
+        LocalInitializationStrategy()
+        if not inplace else InPlaceInitializationStrategy(),
+        DocIndexHandler(target, name),
+        LocalSuccessStrategy() if not inplace else LocalInPlaceSuccessStrategy()
+    )
     converter.run()
 
 
@@ -66,7 +88,10 @@ def convert(ctx, source, tempdir, append, inplace):
                    'in the Tables folder')
 @click.pass_context
 def fileindex(ctx, add, remove):
-    fileindex_handler = FileIndex(ctx.obj['target'], ctx.obj['name'])
+    fileindex_handler = FileIndex(
+        os.path.abspath(ctx.obj['target']),
+        ctx.obj['name']
+    )
 
     if add:
         for f in [os.path.abspath(f) for f in add]:
@@ -77,9 +102,7 @@ def fileindex(ctx, add, remove):
     if remove:
         fileindex_handler.remove_all()
 
-    fileindex_handler.write(
-        os.path.join(ctx.obj['target'], '%s.1' % ctx.obj['name'],
-                     'Indices'))
+    fileindex_handler.write()
 
 
 cli.add_command(convert)
