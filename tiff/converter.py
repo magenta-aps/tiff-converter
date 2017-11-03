@@ -53,7 +53,8 @@ class Converter(object):
             settings: dict,
             file_path_strategy,
             initialization_strategy,
-            docindex_handler
+            docindex_handler,
+            success_strategy
     ):
         self.source = source
         self.target = target
@@ -63,6 +64,7 @@ class Converter(object):
         self.file_path_strategy = file_path_strategy
         self.initialization_strategy = initialization_strategy
         self.docindex_handler = docindex_handler
+        self.success_strategy = success_strategy
 
         self.complex_converter = ComplexConverter(conversion_dir)
 
@@ -79,41 +81,16 @@ class Converter(object):
 
         self.initialization_strategy.prepare(self)
 
-        next_file, tiff_path = self.file_path_strategy.get_next(self)
-        while next_file:
-            # Convert file to TIFF
-            success = self.complex_converter.convert(next_file, tiff_path)
-            if success:
-                self.docindex_handler.add_file(next_file, tiff_path)
-
+        self.next_file, self.tiff_path = self.file_path_strategy.get_next(self)
+        while self.next_file:
+            success = self.complex_converter.convert(self.next_file,
+                                                     self.tiff_path)
+            self.success_strategy.post_convert(success, self)
             clean_conversion_folder(self.conversion_dir)
-            next_file, tiff_path = self.file_path_strategy.get_next(self)
+            self.next_file, self.tiff_path = self.file_path_strategy.get_next(
+                self)
 
         self.docindex_handler.write()
         self.close()
 
         logger.info('Conversion done!')
-
-    # def _reuse_source_as_target_run(self):
-    #
-    #     # The source must be the folder where the AVID.XYZ.nnnn.m's are located
-    #
-    #     self.docindex_handler = DocIndexHandler(
-    #         os.path.join(self.source, '%s.1' % self.name, 'Indices',
-    #                      'docIndex.xml'))
-    #     docindex = self.docindex_handler.get_index()
-    #
-    #     for doc in docindex:
-    #         dID = doc[0].text
-    #         mID = doc[1].text
-    #         dCf = doc[2].text
-    #         path = os.path.join(self.source, '%s.%s' % (self.name, mID),
-    #                             'Documents', dCf, dID)
-    #         source_file = os.path.join(path, os.listdir(path)[0])
-    #
-    #         success = self.complex_converter.convert(
-    #             source_file, os.path.join(path, '1.tif'))
-    #         if success:
-    #             os.remove(source_file)
-    #
-    #         clean_conversion_folder(self.conversion_dir)
