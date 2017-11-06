@@ -62,7 +62,6 @@ def convert(ctx, source, tempdir, append, inplace):
     target = ctx.obj['target']
     name = ctx.obj['name']
 
-    # TODO: in-place case missing...
     converter = tiff.converter.Converter(
         source,
         target,
