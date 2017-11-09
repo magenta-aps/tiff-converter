@@ -60,16 +60,16 @@ class TestParallelConverter(unittest.TestCase,
     def test_should_store_host(self):
         self.assertEqual('localhost', self.converter.host)
 
-    def test_next_file_should_be_folder1_sample2_docx(self):
+    def test_next_file_should_be_folder1_sample1_docx(self):
         self.assertEqual(
-            os.path.join(self.source, 'folder1', 'sample2.docx'),
+            os.path.join(self.source, 'folder1', 'sample1.docx'),
             self.converter._get_next()[0]
         )
 
-    def test_next_file_should_be_folder1_sample1_docx(self):
+    def test_next_file_should_be_folder1_sample2_docx(self):
         self.converter._get_next()
         self.assertEqual(
-            os.path.join(self.source, 'folder1', 'sample1.docx'),
+            os.path.join(self.source, 'folder1', 'sample2.docx'),
             self.converter._get_next()[0]
         )
 
