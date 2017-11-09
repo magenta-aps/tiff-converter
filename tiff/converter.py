@@ -1,3 +1,6 @@
+import pika
+
+import amqp.load
 import tiff.filehandler
 from tiff.pdfconverter import MSOfficeToPdfConverter
 import tiff.tiffconverter
@@ -94,3 +97,38 @@ class Converter(object):
         self.close()
 
         logger.info('Conversion done!')
+
+
+class ParallelConverter(object):
+    QUEUE_NAME = 'conversion'
+
+    def __init__(self, target, name, host, file_path_strategy,
+                 docindex_handler):
+        self.target = target
+        self.name = name
+        self.host = host
+        self.file_path_strategy = file_path_strategy
+        self.docindex_handler = docindex_handler
+        self.connection = None
+
+    def _setup_connection(self):
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=self.host))
+        self.channel = self.connection.channel()
+        self.channel.queue_declare(queue=self.QUEUE_NAME)
+
+    def run(self):
+        pass
+
+    def _get_next(self):
+        return self.file_path_strategy.get_next(self)
+
+    def _send_message(self, next_file: os.path.abspath,
+                      tiff_path: os.path.abspath) -> str:
+        message = amqp.load.message(next_file, tiff_path)
+        self.channel.basic_publish(
+            exchange='',
+            routing_key=self.QUEUE_NAME,
+            body=message
+        )
+        return message

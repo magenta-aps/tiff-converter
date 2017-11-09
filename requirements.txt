@@ -4,4 +4,5 @@ click
 lxml
 coverage
 freezegun
+pika
 
