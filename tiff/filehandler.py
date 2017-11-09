@@ -9,7 +9,7 @@ class LocalFilePathStrategy(object):
     def __init__(self, basedir):
         self.walk = os.walk(basedir)
         try:
-            self.root, self.dirs, self.files = next(self.walk)
+            self._next()
         except StopIteration:
             pass
 
@@ -22,7 +22,7 @@ class LocalFilePathStrategy(object):
             return os.path.join(self.root, filename)
         else:
             try:
-                self.root, self.dirs, self.files = next(self.walk)
+                self._next()
                 return self.get_source_path()
             except StopIteration:
                 return None
@@ -31,6 +31,11 @@ class LocalFilePathStrategy(object):
         mID, dCf, dID = converter.docindex_handler.get_location()
         return create_doc_folder(converter.target, converter.name, mID,
                                  dCf, dID)
+
+    def _next(self):
+        self.root, self.dirs, self.files = next(self.walk)
+        self.dirs.sort()
+        self.files.sort()
 
 
 class InPlaceFilePathStrategy(object):

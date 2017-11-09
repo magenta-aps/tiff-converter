@@ -43,9 +43,9 @@ class TestLocalFilePathStrategy(unittest.TestCase):
         self.assertEqual(os.path.abspath('/base/folder1/sub1/file3'),
                          self.handler.get_source_path())
 
-    def test_should_return_folder2_sub4_file10(self):
+    def test_should_return_folder2_sub4_file9(self):
         self.next(9)
-        self.assertEqual(os.path.abspath('/base/folder2/sub4/file10'),
+        self.assertEqual(os.path.abspath('/base/folder2/sub4/file9'),
                          self.handler.get_source_path())
 
     def test_should_return_None_when_no_more_files(self):
