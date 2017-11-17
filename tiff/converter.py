@@ -100,7 +100,9 @@ class Converter(object):
 
 
 class ParallelConverter(object):
-    QUEUE_NAME = 'conversion'
+    MESSAGE_QUEUE_NAME = 'conversion'
+    PROCESSED_QUEUE_NAME = 'processed'
+    QUEUE_MAX = 100
 
     def __init__(self, target, name, host, file_path_strategy,
                  docindex_handler):
@@ -110,25 +112,63 @@ class ParallelConverter(object):
         self.file_path_strategy = file_path_strategy
         self.docindex_handler = docindex_handler
         self.connection = None
+        self.messages_sent = 0
+        self.messages_processed = 0
 
-    def _setup_connection(self):
+    def _setup_connections(self):
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(host=self.host))
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.QUEUE_NAME)
+
+        self.message_channel = self.connection.channel()
+        self.processed_channel = self.connection.channel()
+
+        self.message_channel.queue_declare(
+            queue=self.MESSAGE_QUEUE_NAME,
+            durable=True
+        )
+        self.message_channel.queue_declare(
+            queue=self.PROCESSED_QUEUE_NAME,
+            durable=True
+        )
 
     def run(self):
-        pass
+        self._setup_connections()
+        self._load_messages(self.QUEUE_MAX)
+        self.processed_channel.basic_consume(
+            self._processed_callback,
+            queue=self.PROCESSED_QUEUE_NAME
+        )
+        self.processed_channel.start_consuming()
+
+    @staticmethod
+    def _processed_callback(channel, method, properties, body):
+        if str(body, 'utf-8').lower() == 'end':
+            print('############ END ##############')
+            channel.stop_consuming()
 
     def _get_next(self):
         return self.file_path_strategy.get_next(self)
 
+    def _load_messages(self, n: int):
+        """
+        Load messages into queue
+        :param n: Number of messages to load into queue
+        :return:
+        """
+        for i in range(n):
+            next_file, tiff_path = self._get_next()
+            self._send_message(next_file, tiff_path)
+
     def _send_message(self, next_file: os.path.abspath,
                       tiff_path: os.path.abspath) -> str:
         message = amqp.load.message(next_file, tiff_path)
-        self.channel.basic_publish(
+        self.message_channel.basic_publish(
             exchange='',
-            routing_key=self.QUEUE_NAME,
-            body=message
+            routing_key=self.MESSAGE_QUEUE_NAME,
+            body=message,
+            properties=pika.BasicProperties(
+                delivery_mode=2,  # make message persistent
+            )
         )
+        self.messages_sent += 1
         return message

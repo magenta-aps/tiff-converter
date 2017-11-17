@@ -1,5 +1,6 @@
 import json
 import os
+import pika
 import unittest
 
 import amqp.load
@@ -26,12 +27,28 @@ class TestParallelConverter(unittest.TestCase,
             LocalFilePathStrategy(self.source),
             DocIndexHandler(self.target, self.name)
         )
-        self.converter._setup_connection()
+        self.converter._setup_connections()
 
     def tearDown(self):
-        self.converter.channel.queue_delete(queue=ParallelConverter.QUEUE_NAME)
+        self.converter.message_channel.queue_delete(
+            queue=ParallelConverter.MESSAGE_QUEUE_NAME)
+        self.converter.message_channel.queue_delete(
+            queue=ParallelConverter.PROCESSED_QUEUE_NAME)
         self.converter.connection.close()
         self.cleanup()
+
+    def _send_processed_queue_message(self, body):
+        send_channel = self.converter.connection.channel()
+        send_channel.queue_declare(queue=ParallelConverter.PROCESSED_QUEUE_NAME,
+                                   durable=True)
+        send_channel.basic_publish(
+            exchange='',
+            routing_key=self.converter.PROCESSED_QUEUE_NAME,
+            body=body,
+            properties=pika.BasicProperties(
+                delivery_mode=2,
+            )
+        )
 
     def test_should_aggregate_localfilepathstrategy(self):
         converter = ParallelConverter(None, None, None,
@@ -104,15 +121,14 @@ class TestParallelConverter(unittest.TestCase,
 
     def test_store_channel(self):
         self.assertEqual('BlockingChannel',
-                         self.converter.channel.__class__.__name__)
+                         self.converter.message_channel.__class__.__name__)
 
-    # TODO: maybe use a test spy here
     def test_should_load_message1_into_queue(self):
         next_file, tiff_path = self.converter._get_next()
         self.converter._send_message(next_file, tiff_path)
 
-        message_from_queue = str(self.converter.channel.basic_get(
-            queue=ParallelConverter.QUEUE_NAME)[-1], 'utf-8')
+        message_from_queue = str(self.converter.message_channel.basic_get(
+            queue=ParallelConverter.MESSAGE_QUEUE_NAME)[-1], 'utf-8')
 
         self.assertEqual(
             json.dumps({
@@ -122,10 +138,105 @@ class TestParallelConverter(unittest.TestCase,
             message_from_queue
         )
 
+    def test_messages_sent_is_0_when_no_messages_are_sent(self):
+        self.assertEqual(0, self.converter.messages_sent)
+
+    def test_messages_sent_is_1_when_1_messages_is_sent(self):
+        self.converter._send_message('dummy1', 'dummy2')
+        self.assertEqual(1, self.converter.messages_sent)
+
+    def test_max_queue_length_should_be_100(self):
+        self.assertEqual(100, self.converter.QUEUE_MAX)
+
+    def test_should_load_1_messages_into_queue(self):
+        self.converter._load_messages(1)
+        self.assertEqual(1, self.converter.messages_sent)
+
+        message_from_queue = str(self.converter.message_channel.basic_get(
+            queue=ParallelConverter.MESSAGE_QUEUE_NAME)[-1], 'utf-8')
+
+        self.assertEqual(
+            json.dumps({
+                'next': os.path.join(self.source, 'folder1', 'sample1.docx'),
+                'tiff': os.path.join(self.target, '%s.1' % self.name,
+                                     'Documents', 'docCollection1', '1',
+                                     '1.tif')
+            }),
+            message_from_queue
+        )
+
+    def test_should_load_2_messages_into_queue(self):
+        self.converter._load_messages(2)
+        self.assertEqual(2, self.converter.messages_sent)
+
+        message_from_queue = str(self.converter.message_channel.basic_get(
+            queue=ParallelConverter.MESSAGE_QUEUE_NAME)[-1], 'utf-8')
+        self.assertEqual(
+            json.dumps({
+                'next': os.path.join(self.source, 'folder1', 'sample1.docx'),
+                'tiff': os.path.join(self.target, '%s.1' % self.name,
+                                     'Documents', 'docCollection1', '1',
+                                     '1.tif')
+            }),
+            message_from_queue
+        )
+
+        message_from_queue = str(self.converter.message_channel.basic_get(
+            queue=ParallelConverter.MESSAGE_QUEUE_NAME)[-1], 'utf-8')
+        self.assertEqual(
+            json.dumps({
+                'next': os.path.join(self.source, 'folder1', 'sample2.docx'),
+                'tiff': os.path.join(self.target, '%s.1' % self.name,
+                                     'Documents', 'docCollection1', '2',
+                                     '1.tif')
+            }),
+            message_from_queue
+        )
+
+    # @unittest.skip('ksjdksj')
+    def test_only_add_max_messages_to_queue(self):
+        self.converter.QUEUE_MAX = 3  # For convenience
+        self._send_processed_queue_message('end')
+        self.converter.run()
+        self.assertEqual(3, self.converter.messages_sent)
+
+    def test_progress_count_should_be_0_initially(self):
+        self.assertEqual(0, self.converter.messages_processed)
+
+    @unittest.skip('later')
+    def test_progress_count_should_be_1_when_first_messages_processed(self):
+        # send_channel = self.converter.connection.channel()
+        # send_channel.queue_declare(queue=ParallelConverter.PROCESSED_QUEUE_NAME,
+        #                            durable=True)
+        # send_channel.basic_publish(
+        #     exchange='',
+        #     routing_key=self.converter.PROCESSED_QUEUE_NAME,
+        #     body='1',
+        #     properties=pika.BasicProperties(
+        #         delivery_mode=2,
+        #     )
+        # )
+        self._send_processed_queue_message('1')
+        self.converter.run()
+
+        self.assertEqual(1, self.converter.messages_processed)
+
+    # def test_should_consume_progress_queue(self):
+    #     pass
+
     def test_x(self):
         pass
 
-# should close connection
+
+# MAX = queue size = 10
+
+# should add MAX messages to queue
+# should check progress queue for progress
+# should store progress
+# should load more messages into queue if number of messages in queues < MAX/2
+# should only load more messages if any left
+# should only load as many messages as are left
+# should close connection all messages have passed through
 
 
 class TestProduceQueueMessages(unittest.TestCase):
